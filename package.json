@@ -1,0 +1,32 @@
+{
+  "name": "GitBit",
+  "version": "1.0.0",
+  "description": "The GitBit Bot.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:vasujain/gitbitbot.git"
+  },
+  "keywords": [
+    "slack",
+    "bot"
+  ],
+  "author": "VJ",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vasujain/gitbitbot/issues"
+  },
+  "homepage": "https://github.com/vasujain/gitbitbot#readme",
+  "engines": {
+    "node": "5.1.1"
+  },
+  "dependencies": {
+    "botkit": "0.0.5",
+    "botkit-storage-mongo": "^1.0.2",
+    "mongodb": "^1.4.39"
+  }
+}

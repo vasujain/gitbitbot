@@ -1,0 +1,13 @@
+{
+    "repo_org" : "Organization",
+    "github_api_url" : "https://github.com/api/v3/",
+    "auth_token" : "token {{token$}}",
+    "repos" : {
+        "repo1_key" : "repo1_name",
+        "repo2_key" : "repo2_name",
+        "repo3_key" : "repo3_name",
+        "repo4_key" : "repo4_name",
+        "repo5_key" : "repo5_name",
+        "repo6_key" : "repo6_name"
+    }
+}
