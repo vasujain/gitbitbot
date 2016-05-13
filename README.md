@@ -3,6 +3,9 @@
 ## The story of a GitBit (Slack)bot
 We at Braintree/PayPal have tradition of having every alternate Fridays as Developer Days. This day (one of the most exciting day of the sprint for me) is like a mini hack day. You can spent time learning something new/reading/coding something new. One of the Dev Days I deecided to write my first ever Bot (Slack Bot). And here it is !!
 
+## What is GitBit Slack Bot or What does it do ?
+GitBit Slack Bot is a Bot for Slack teams that they can configure and quickly have a look at open pull requests in their configured repositories. 
+
 ## Setup Instructions
 1. Fork this project.
 2. Open up your favorite terminal app, and clone your new repository to your local computer.
@@ -18,6 +21,10 @@ We at Braintree/PayPal have tradition of having every alternate Fridays as Devel
 7. Once started Go to slack and find a new bot user "gitbit" added
 8. Start talking to Bot via commands like : 
     pr all -- Display all open Pull requests in all The Github Repos configured in config.json
-    pr {$repo1_key} -- Display all open Pull requests in the Github Repos {$repo1_name} configured for {$repo1_key} configured in config.json
+    pr `{$repo1_key}` -- Display all open Pull requests in the Github Repos `{$repo1_name}` configured for `{$repo1_key}` configured in `config.json`
 
-Request new features at https://github.com/vasujain/gitbitbot/issues  
+## Future
+Configurable Slack button coming soon @ https://vasujain.github.io/gitbitbot/
+
+## Support/Request new features
+For Support / Requesting new features -- create an issue at https://github.com/vasujain/gitbitbot/issues  
