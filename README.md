@@ -1,14 +1,22 @@
 # GitBit Slack Bot
 
-## Setup
-1. Clone the repository
-2. Navigate to cloned repo
-3. Do a npm instll to get all the node_modules
-4. Rename config.clone.json to config.json . Update Org/Repo in config.
+## The story of a GitBit (Slack)bot
+We at Braintree/PayPal have tradition of having every alternate Fridays as Developer Days. This day (one of the most exciting day of the sprint for me) is like a mini hack day. You can spent time learning something new/reading/coding something new. One of the Dev Days I deecided to write my first ever Bot (Slack Bot). And here it is !!
+
+## Setup Instructions
+1. Fork this project.
+2. Open up your favorite terminal app, and clone your new repository to your local computer.
+3. This is a Node.js project, so you’ll need to install the various dependencies by running: npm install to get all the node_modules
+4. Rename `config.clone.json` to `config.json`. Update Organization/Repositories in `config.json`.
 5. Add a bot Integration to your slack channel at https://{{$slack_channel}}.slack.com/apps/new/A0F7YS25R-bots
-6. From the cloned repo run the command -- TOKEN={{$token}} npm start  (Copy token from Integration Settings >> API Token)
-6. Once started Go to slack and find a new bot user "gitbit" added
-7. Start talking to Bot via commands like : 
+6. From the terminal you can run your bot easily:
+
+    ```bash
+    TOKEN=xoxb-your-token-here npm start
+    ```
+ (Copy token from Integration Settings >> API Token)
+7. Once started Go to slack and find a new bot user "gitbit" added
+8. Start talking to Bot via commands like : 
     pr all -- Display all open Pull requests in all The Github Repos configured in config.json
     pr {$repo1_key} -- Display all open Pull requests in the Github Repos {$repo1_name} configured for {$repo1_key} configured in config.json
 
