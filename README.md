@@ -23,6 +23,24 @@ GitBit Slack Bot is a Bot for Slack teams that they can configure and quickly ha
     pr all -- Display all open Pull requests in all The Github Repos configured in config.json
     pr `{$repo1_key}` -- Display all open Pull requests in the Github Repos `{$repo1_name}` configured for `{$repo1_key}` configured in `config.json`
 
+e.g. config.json
+
+```json
+{
+    "repo_org" : "paypal/",
+    "github_api_url" : "https://api.github.com/",
+    "auth_token" : "token your-token",
+    "repos" : {
+        "java" : "PayPal-Java-SDK",
+        "php" : "PayPal-PHP-SDK",
+        "py" : "PayPal-Python-SDK",
+        "ruby" : "PayPal-Ruby-SDK",
+        "node" : "PayPal-node-SDK"
+    }
+} 
+
+```
+
 ## Future
 Configurable Slack button coming soon @ https://vasujain.github.io/gitbitbot/
 
