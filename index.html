@@ -13,7 +13,7 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>GitBitBot by vasujain</title>
+    <title>Gitbitbot by vasujain</title>
   </head>
 
   <body>
@@ -28,29 +28,70 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome to GitBit Slack Bot.</h3>
+          <h1>
+<a id="gitbit-slack-bot" class="anchor" href="#gitbit-slack-bot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GitBit Slack Bot</h1>
 
-<p>A slack bot to pull up your organization's Github details in a Slack chat.</p>
+<h2>
+<a id="the-story-of-a-gitbit-slackbot" class="anchor" href="#the-story-of-a-gitbit-slackbot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The story of a GitBit (Slack)bot</h2>
 
+<p>We at Braintree/PayPal have tradition of having every alternate Fridays as Developer Days. This day (one of the most exciting day of the sprint for me) is like a mini hack day. You can spent time learning something new/reading/coding something new. One of the Dev Days I deecided to write my first ever Bot (Slack Bot). And here it is !!</p>
 
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<h2>
+<a id="what-is-gitbit-slack-bot-or-what-does-it-do-" class="anchor" href="#what-is-gitbit-slack-bot-or-what-does-it-do-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is GitBit Slack Bot or What does it do ?</h2>
 
-<p>GitHub username <a href="https://github.com/vasujain" class="user-mention">@vasujain</a> </p>
+<p>GitBit Slack Bot is a Bot for Slack teams that they can configure and quickly have a look at open pull requests in their configured repositories. </p>
 
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
+<h2>
+<a id="setup-instructions" class="anchor" href="#setup-instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup Instructions</h2>
 
-<p>Having trouble/issues ? Check out our <a href="https://github.com/vasujain/gitbitbot/issues">support</a> and we’ll sort it out.</p>
+<ol>
+<li>Fork this project.</li>
+<li>Open up your favorite terminal app, and clone your new repository to your local computer.</li>
+<li>This is a Node.js project, so you’ll need to install the various dependencies by running: npm install to get all the node_modules</li>
+<li>Rename <code>config.clone.json</code> to <code>config.json</code>. Update Organization/Repositories in <code>config.json</code>.</li>
+<li>Add a bot Integration to your slack channel at https://{{$slack_channel}}.slack.com/apps/new/A0F7YS25R-bots</li>
+<li>
+<p>From the terminal you can run your bot easily:</p>
+
+<div class="highlight highlight-source-shell"><pre>TOKEN=xoxb-your-token-here npm start</pre></div>
+
+<p>(Copy token from Integration Settings &gt;&gt; API Token)</p>
+</li>
+<li>Once started Go to slack and find a new bot user "gitbit" added</li>
+<li>Start talking to Bot via commands like : 
+pr all -- Display all open Pull requests in all The Github Repos configured in config.json
+pr <code>{$repo1_key}</code> -- Display all open Pull requests in the Github Repos <code>{$repo1_name}</code> configured for <code>{$repo1_key}</code> configured in <code>config.json</code>
+</li>
+</ol>
+
+<p>e.g. config.json</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>repo_org<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>paypal/<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>github_api_url<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>https://api.github.com/<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>auth_token<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>token your-token<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>repos<span class="pl-pds">"</span></span> : {
+        <span class="pl-s"><span class="pl-pds">"</span>java<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>PayPal-Java-SDK<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>php<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>PayPal-PHP-SDK<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>py<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>PayPal-Python-SDK<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>ruby<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>PayPal-Ruby-SDK<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>node<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>PayPal-node-SDK<span class="pl-pds">"</span></span>
+    }
+} 
+</pre></div>
+
+<h2>
+<a id="future" class="anchor" href="#future" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future</h2>
+
+<p>Configurable Slack button coming soon @ <a href="https://vasujain.github.io/gitbitbot/">https://vasujain.github.io/gitbitbot/</a></p>
+
+<h2>
+<a id="supportrequest-new-features" class="anchor" href="#supportrequest-new-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support/Request new features</h2>
+
+<p>For Support / Requesting new features -- create an issue at <a href="https://github.com/vasujain/gitbitbot/issues">https://github.com/vasujain/gitbitbot/issues</a>  </p>
         </section>
 
         <aside id="sidebar">
-          <!-- Slack Bot -->
-          <a href="https://slack.com/oauth/authorize?scope=commands,bot&client_id=33396274820.42534330194">
-            <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" />
-          </a>
-          <br/><br/>    
           <a href="https://github.com/vasujain/gitbitbot/zipball/master" class="button">
             <small>Download</small>
             .zip file
@@ -60,12 +101,13 @@
             .tar.gz file
           </a>
 
-          <p class="repo-owner"><a href="https://github.com/vasujain/gitbitbot"></a> Maintained by <a href="https://github.com/vasujain">vasujain</a>.</p>
+          <p class="repo-owner"><a href="https://github.com/vasujain/gitbitbot"></a> is maintained by <a href="https://github.com/vasujain">vasujain</a>.</p>
 
-          <p><a href="https://pages.github.com">GitHub Pages</a>.</p>
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
       </div>
     </div>
+
   
   </body>
 </html>
