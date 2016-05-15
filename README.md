@@ -1,6 +1,6 @@
 # GitBit Slack Bot
 
-## The story of a GitBit (Slack)bot
+## The story of GitBit (Slack) bot
 We at Braintree/PayPal have tradition of having every alternate Fridays as Developer Days. This day (one of the most exciting day of the sprint for me) is like a mini hack day. You can spent time learning something new/reading/coding something new. One of the Dev Days I deecided to write my first ever Bot (Slack Bot). And here it is !!
 
 ## What is GitBit Slack Bot or What does it do ?
