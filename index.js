@@ -93,11 +93,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
                 githubGetPullRequest(BotConfig.repos[r], bot, message, flagZeroPRComment);
             }
         } else if (repo == 'all') {
-            var orgRepos = getListOfAllGithubReposInOrg();
-            console.log("ghArray3" + orgRepos);
-            for (var orgRepo in orgRepos) {
-                githubGetPullRequest(orgRepo, bot, message, flagZeroPRComment);
-            }
+           getListOfAllGithubReposInOrg(bot, message);
         } else {
             bot.reply(message, "Invalid request or Repo not configured");
         }
@@ -149,7 +145,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
 }
 
 // Getting list of all Github Repos in an Org. Can be 100+. For the initial phase only top 100 results will display
-function getListOfAllGithubReposInOrg() {
+function getListOfAllGithubReposInOrg(bot, message) {
     console.log("Getting list of all Github Repos in an Org. Can be 100+....");
     var ghArray = new Array();
     var url = BotConfig.github_api_url + 'orgs/' + BotConfig.repo_org + 'repos?per_page=' + BotConfig.max_page_count;
@@ -164,22 +160,20 @@ function getListOfAllGithubReposInOrg() {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-        ghArray = constructAllGithubRepoObject(body);
-        return ghArray;
-        console.log("ghArray1" + ghArray);
+        ghArray = constructAllGithubRepoObject(body, bot, message);
     });
-    console.log("ghArray2" + ghArray);
-    return ghArray;
+    console.log("getListOfAllGithubReposInOrg executed successfully.\n");
 }
 
 // Parse the Org Repos response json and extracting Repo details out of it.
-function constructAllGithubRepoObject(body) {
+function constructAllGithubRepoObject(body, bot, message) {
     console.log("Parsing the Org Repos response json and extracting Repo details out of it...");
     var orgGithubRepo = new Array();
     var obj = JSON.parse(body);
     var objLength = obj.length;
     for (var i = 0; i < objLength; i++) {
         orgGithubRepo.push(obj[i].name);
+        githubGetPullRequest(obj[i].name, bot, message, false);
     }
-    return orgGithubRepo;
+    console.log("constructAllGithubRepoObject executed successfully.\n");
 }
