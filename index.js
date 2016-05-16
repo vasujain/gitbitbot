@@ -83,12 +83,20 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
     var repo = message.match[1];
     if (typeof repo !== 'undefined' && repo) {
         var githubRepo = BotConfig.repos[repo];
+        var flagZeroPRComment = false;
         console.log(githubRepo);
         if (githubRepo) {
-            githubGetPullRequest(githubRepo, bot, message);
-        } else if (repo == 'all') {
+            flagZeroPRComment = true;
+            githubGetPullRequest(githubRepo, bot, message, flagZeroPRComment);
+        } else if (repo == 'custom') {
             for (var r in BotConfig.repos) {
-                githubGetPullRequest(BotConfig.repos[r], bot, message);
+                githubGetPullRequest(BotConfig.repos[r], bot, message, flagZeroPRComment);
+            }
+        } else if (repo == 'all') {
+            var orgRepos = getListOfAllGithubReposInOrg();
+            console.log("ghArray3" + orgRepos);
+            for (var orgRepo in orgRepos) {
+                githubGetPullRequest(orgRepo, bot, message, flagZeroPRComment);
             }
         } else {
             bot.reply(message, "Invalid request or Repo not configured");
@@ -99,7 +107,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
 });
 
 // Make a POST call to GITHUB API to fetch all OPEN PR's
-function githubGetPullRequest(repo, bot, message) {
+function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
     console.log("Making a POST call to GITHUB API to fetch all OPEN PR's...");
     var token = BotConfig.auth_token;
     var request = require('request');
@@ -114,25 +122,64 @@ function githubGetPullRequest(repo, bot, message) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-        parseAndResponse(body, bot, message, repo);
+        parseAndResponse(body, bot, message, repo, flagZeroPRComment);
     });
 }
 
 // Parse the pull response json and extract PR#, Title, User out of it.
-function parseAndResponse(body, bot, message, repo) {
-    var repoSource = BotConfig.repo_org + repo + " Open Pull Requests : \n";
-    bot.reply(message, repoSource);
+function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
+    var repoSource = BotConfig.repo_org + repo + " Open Pull Requests : ";
+    var response = repoSource;
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
     var obj = JSON.parse(body);
     var objLength = obj.length;
-    var response = "";
     if (objLength == 0) {
-        response += "No open PR's @ the moment ! Are you guys coding ?"
+        if(flagZeroPRComment) {
+            response += "No open PR's @ the moment ! Are you guys coding ?"
+        } else {
+            response += "0."
+        }
     } else {
         for (var i = 0; i < objLength; i++) {
-            response += "PR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login + "\n";
+            response += "\nPR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
         }
     }
     bot.reply(message, response);
     console.log(response);
+}
+
+// Getting list of all Github Repos in an Org. Can be 100+. For the initial phase only top 100 results will display
+function getListOfAllGithubReposInOrg() {
+    console.log("Getting list of all Github Repos in an Org. Can be 100+....");
+    var ghArray = new Array();
+    var url = BotConfig.github_api_url + 'orgs/' + BotConfig.repo_org + 'repos?per_page=' + BotConfig.max_page_count;
+    console.log(url);
+    var request = require('request');
+    request({
+        headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': BotConfig.auth_token,
+            'User-Agent': 'GitBit-slackbot'
+        },
+        uri: url,
+        method: 'GET'
+    }, function(err, res, body) {
+        ghArray = constructAllGithubRepoObject(body);
+        return ghArray;
+        console.log("ghArray1" + ghArray);
+    });
+    console.log("ghArray2" + ghArray);
+    return ghArray;
+}
+
+// Parse the Org Repos response json and extracting Repo details out of it.
+function constructAllGithubRepoObject(body) {
+    console.log("Parsing the Org Repos response json and extracting Repo details out of it...");
+    var orgGithubRepo = new Array();
+    var obj = JSON.parse(body);
+    var objLength = obj.length;
+    for (var i = 0; i < objLength; i++) {
+        orgGithubRepo.push(obj[i].name);
+    }
+    return orgGithubRepo;
 }
