@@ -3,6 +3,7 @@
     "github_api_url" : "https://github.com/api/v3/",
     "auth_token" : "token {{token$}}",
     "max_page_count": "10",
+    "disable_zero_pr_repo": "true",
     "repos" : {
         "repo1_key" : "repo1_name",
         "repo2_key" : "repo2_name",
