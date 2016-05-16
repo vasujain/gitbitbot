@@ -72,7 +72,7 @@ controller.on('rtm_close', function(bot) {
 
 // Core bot logic !
 controller.on('bot_channel_join', function(bot, message) {
-    bot.reply(message, "I'm here!")
+    bot.reply(message, "Thank you for inviting me to your Slack Channel!")
 });
 
 controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
@@ -84,7 +84,6 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
     if (typeof repo !== 'undefined' && repo) {
         var githubRepo = BotConfig.repos[repo];
         var flagZeroPRComment = false;
-        console.log(githubRepo);
         if (githubRepo) {
             flagZeroPRComment = true;
             githubGetPullRequest(githubRepo, bot, message, flagZeroPRComment);
@@ -98,7 +97,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
             bot.reply(message, "Invalid request or Repo not configured");
         }
     } else {
-        bot.reply(message, "Invalid request or Repo not configured");
+        bot.reply(message, "Repo is undefined -- Invalid request or Repo not configured");
     }
 });
 
@@ -131,21 +130,23 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     var objLength = obj.length;
     if (objLength == 0) {
         if (!BotConfig.disable_zero_pr_repo) { //if false, then only display Repo with Zero PR 
-            response += repoSource;
+            response = repoSource;
             if (flagZeroPRComment) {
                 response += "No open PR's @ the moment ! Are you guys coding ?"
             } else {
                 response += "0."
             }
+            bot.reply(message, response);
         }
     } else {
-        response += repoSource;
+        response = repoSource;
         for (var i = 0; i < objLength; i++) {
             response += "\nPR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
+            bot.reply(message, response);
         }
     }
-    bot.reply(message, response);
     console.log(response);
+    console.log("parseAndResponse for " + repo + " with " + objLength + " PR'(s) executed successfully.");
 }
 
 // Getting list of all Github Repos in an Org. Can be 100+. For the initial phase only top 100 results will display
