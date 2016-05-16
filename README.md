@@ -30,6 +30,7 @@ e.g. config.json
     "repo_org" : "paypal/",
     "github_api_url" : "https://api.github.com/",
     "auth_token" : "token your-token",
+    "max_page_count": "10",
     "repos" : {
         "java" : "PayPal-Java-SDK",
         "php" : "PayPal-PHP-SDK",
