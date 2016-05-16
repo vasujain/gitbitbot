@@ -31,6 +31,7 @@ e.g. config.json
     "github_api_url" : "https://api.github.com/",
     "auth_token" : "token your-token",
     "max_page_count": "10",
+    "disable_zero_pr_repo": "true",
     "repos" : {
         "java" : "PayPal-Java-SDK",
         "php" : "PayPal-PHP-SDK",
@@ -41,6 +42,8 @@ e.g. config.json
 } 
 
 ```
+`disable_zero_pr_repo` to disable showing Repos with Zero PR's
+`max_page_count` to set max result count. At present Github supports max=100 which may kill Slack RTM Api in certain instances. Also only initial page support is added as of now. 
 
 ## Future
 Configurable Slack button coming soon @ https://vasujain.github.io/gitbitbot/
