@@ -93,7 +93,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
                 githubGetPullRequest(BotConfig.repos[r], bot, message, flagZeroPRComment);
             }
         } else if (repo == 'all') {
-           getListOfAllGithubReposInOrg(bot, message);
+            getListOfAllGithubReposInOrg(bot, message);
         } else {
             bot.reply(message, "Invalid request or Repo not configured");
         }
@@ -124,18 +124,22 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
-    var repoSource = BotConfig.repo_org + repo + " Open Pull Requests : ";
-    var response = repoSource;
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
+    var repoSource = BotConfig.repo_org + repo + " Open Pull Requests : ";
+    var response = "";
     var obj = JSON.parse(body);
     var objLength = obj.length;
     if (objLength == 0) {
-        if(flagZeroPRComment) {
-            response += "No open PR's @ the moment ! Are you guys coding ?"
-        } else {
-            response += "0."
+        if (!BotConfig.disable_zero_pr_repo) { //if false, then only display Repo with Zero PR 
+            response += repoSource;
+            if (flagZeroPRComment) {
+                response += "No open PR's @ the moment ! Are you guys coding ?"
+            } else {
+                response += "0."
+            }
         }
     } else {
+        response += repoSource;
         for (var i = 0; i < objLength; i++) {
             response += "\nPR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
         }
