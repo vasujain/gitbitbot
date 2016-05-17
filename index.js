@@ -44,7 +44,6 @@ if (process.env.MONGOLAB_URI) {
     };
 }
 
-console.log(process.env.TOKEN);
 if (process.env.TOKEN || process.env.SLACK_TOKEN) {
     //Treat this as a custom integration
     var customIntegration = require('./lib/custom_integrations');
@@ -71,6 +70,8 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function(bot) {
     console.log('** The RTM api just connected!');
+                getListOfAllGithubReposInOrg(bot, message);
+
 });
 
 controller.on('rtm_close', function(bot) {
