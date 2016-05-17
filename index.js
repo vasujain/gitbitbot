@@ -7,6 +7,9 @@
 var https = require('https');
 var BotConfig = require('./config.json');
 
+var authTokenEncrypted = BotConfig.auth_token;
+var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
+
 function onInstallation(bot, installer) {
     if (installer) {
         bot.startPrivateConversation({
@@ -104,14 +107,13 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
 // Make a POST call to GITHUB API to fetch all OPEN PR's
 function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
     console.log("Making a POST call to GITHUB API to fetch all OPEN PR's...");
-    var token = BotConfig.auth_token;
     var request = require('request');
     var url = BotConfig.github_api_url + 'repos/' + BotConfig.repo_org + repo + '/pulls?state=open';
     console.log(url);
     request({
         headers: {
             'Accept': 'application/vnd.github.v3+json',
-            'Authorization': token,
+            'Authorization': authTokenDecrypted,
             'User-Agent': 'GitBit-slackbot'
         },
         uri: url,
@@ -159,7 +161,7 @@ function getListOfAllGithubReposInOrg(bot, message) {
     request({
         headers: {
             'Accept': 'application/vnd.github.v3+json',
-            'Authorization': BotConfig.auth_token,
+            'Authorization': authTokenDecrypted,
             'User-Agent': 'GitBit-slackbot'
         },
         uri: url,
