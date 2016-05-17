@@ -1,3 +1,6 @@
 name: Git Bit Bot
 description: A git bit node.js bot
-avatar: avatar.png
+avatar: avatar_gitbit.png
+slackscopes:
+  - bot
+  - commands

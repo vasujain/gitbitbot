@@ -1,0 +1,18 @@
+{
+    "repo_org" : "paypal/",
+    "github_api_url" : "https://api.github.com/",
+    "auth_token" : "token ",
+    "max_page_count": "10",
+    "disable_zero_pr_repo": "true",
+    "repos" : {
+        "java" : "PayPal-Java-SDK",
+        "net" : "PayPal-NET-SDK",
+        "php" : "PayPal-PHP-SDK",
+        "py" : "PayPal-Python-SDK",
+        "ruby" : "PayPal-Ruby-SDK",
+        "ios" : "PayPal-iOS-SDK",
+        "node" : "PayPal-node-SDK",
+        "android" : "PayPal-Android-SDK",
+        "legacy" : "PayPal-Legacy-Java-SDK"
+    }
+}
