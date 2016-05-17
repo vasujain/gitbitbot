@@ -94,7 +94,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
         } else if (repo == 'all') {
             getListOfAllGithubReposInOrg(bot, message);
         } else {
-            bot.reply(message, "Invalid request or Repo not configured");
+            bot.reply(message, "Invalid Repo or Repo not configured");
         }
     } else {
         bot.reply(message, "Repo is undefined -- Invalid request or Repo not configured");
