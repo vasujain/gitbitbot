@@ -44,6 +44,7 @@ if (process.env.MONGOLAB_URI) {
     };
 }
 
+console.log(process.env.TOKEN);
 if (process.env.TOKEN || process.env.SLACK_TOKEN) {
     //Treat this as a custom integration
     var customIntegration = require('./lib/custom_integrations');
