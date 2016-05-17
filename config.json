@@ -1,7 +1,7 @@
 {
     "repo_org" : "paypal/",
     "github_api_url" : "https://api.github.com/",
-    "auth_token" : "token ",
+    "auth_token" : "token aa233e7f9225dc54afbaf635f45b30d45d9c4e44",
     "max_page_count": "10",
     "disable_zero_pr_repo": "true",
     "repos" : {
