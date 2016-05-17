@@ -8,7 +8,11 @@ var https = require('https');
 var BotConfig = require('./config.json');
 
 var authTokenEncrypted = BotConfig.auth_token;
-var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
+//var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
+
+// For Node.js v5.11.1 and below
+var buf = new Buffer(authTokenEncrypted, 'base64');
+var authTokenDecrypted = "token " + buf.toString("ascii");
 
 function onInstallation(bot, installer) {
     if (installer) {
