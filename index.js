@@ -13,6 +13,7 @@ var authTokenEncrypted = BotConfig.auth_token;
 // For Node.js v5.11.1 and below
 var buf = new Buffer(authTokenEncrypted, 'base64');
 var authTokenDecrypted = "token " + buf.toString("ascii");
+var colors = ['green', 'red', 'blue', 'yellow'];
 
 function onInstallation(bot, installer) {
     if (installer) {
@@ -145,11 +146,18 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
             bot.reply(message, response);
         }
     } else {
-        response = repoSource;
         for (var i = 0; i < objLength; i++) {
             response += "\nPR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
-            bot.reply(message, response);
         }
+        bot.reply(message, {
+            "attachments": [{
+                "fallback": repoSource,
+                "color": "#36a64f",
+                "title": repoSource,
+//                "title_link": BotConfig.github_api_url + 'repos/' + BotConfig.repo_org + repo ,
+                "text": response
+            }]
+        });
     }
     console.log(response);
     console.log("parseAndResponse for " + repo + " with " + objLength + " PR'(s) executed successfully.");
@@ -188,4 +196,3 @@ function constructAllGithubRepoObject(body, bot, message) {
     }
     console.log("constructAllGithubRepoObject executed successfully.\n");
 }
-
