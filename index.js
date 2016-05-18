@@ -50,7 +50,7 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
     var customIntegration = require('./lib/custom_integrations');
     var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
     var controller = customIntegration.configure(token, config, onInstallation);
-} else if (process.env.CLIENT_ID && process.env.CLIENT_SECRET && process.env.PORT) {
+//} else if (process.env.CLIENT_ID && process.env.CLIENT_SECRET && process.env.PORT) {
     //Treat this as an app
     var app = require('./lib/apps');
     var controller = app.configure(process.env.PORT, process.env.CLIENT_ID, process.env.CLIENT_SECRET, config, onInstallation);
