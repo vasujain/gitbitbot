@@ -58,8 +58,33 @@ if (process.env.MONGOLAB_URI) {
 //   var app = require('./lib/apps');
 //   controller = app.configure(config, onInstallation);
 //} 
-   var app = require('./lib/apps');
-   var controller = app.configure(config, onInstallation);
+//   var app = require('./lib/apps');
+//   var controller = app.configure(config, onInstallation);
+
+var Botkit = require("botkit");
+var beepboop = require("beepboop-botkit");
+
+var token = process.env.SLACK_TOKEN
+
+var controller = Botkit.slackbot({
+  debug: false
+});
+
+if (token) {
+  console.log("Starting in single-team mode")
+  controller.spawn({
+    token: token
+  }).startRTM(function(err,bot,payload) {
+    if (err) {
+      throw new Error(err);
+    }
+  });
+} else {
+  console.log("Starting in Beep Boop multi-team mode")
+  require('beepboop-botkit').start(controller, { debug: true })
+}
+
+
 
 
 /**
