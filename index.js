@@ -6,6 +6,7 @@
 // Libraries
 var https = require('https');
 var BotConfig = require('./config.json');
+var beepboop = require('beepboop-botkit').start(controller, { debug: true });
 
 var authTokenEncrypted = BotConfig.auth_token;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
