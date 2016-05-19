@@ -28,6 +28,6 @@
     "botkit": "0.0.5",
     "botkit-storage-mongo": "^1.0.2",
     "mongodb": "^1.4.39",
-    "beepboop-botkit": "^1.1.1",
+    "beepboop-botkit": "^1.1.1"
   }
 }
