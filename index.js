@@ -57,7 +57,7 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
 //} else {
 //    console.log('Error: If this is a custom integration, please specify TOKEN in the environment. If this is an app, please specify CLIENTID, CLIENTSECRET, and PORT in the environment');
 //    process.exit(1);
-//}
+}
 
 
 /**
