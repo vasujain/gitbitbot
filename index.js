@@ -45,7 +45,7 @@ if (process.env.MONGOLAB_URI) {
     };
 }
 
-if (process.env.TOKEN || process.env.SLACK_TOKEN) {
+//if (process.env.TOKEN || process.env.SLACK_TOKEN) {
     //Treat this as a custom integration
     var customIntegration = require('./lib/custom_integrations');
     var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
@@ -57,7 +57,7 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
 //} else {
 //    console.log('Error: If this is a custom integration, please specify TOKEN in the environment. If this is an app, please specify CLIENTID, CLIENTSECRET, and PORT in the environment');
 //    process.exit(1);
-}
+} 
 
 
 /**
