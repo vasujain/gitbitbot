@@ -45,20 +45,21 @@ if (process.env.MONGOLAB_URI) {
     };
 }
 
-var controller;
-if (process.env.TOKEN || process.env.SLACK_TOKEN) {
-    console.log("custom integration");
-   //Treat this as a custom integration
-   var customIntegration = require('./lib/custom_integrations');
-   var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
-   controller = customIntegration.configure(token, config, onInstallation);
-} else {
-    console.log("multi team");
-   //Treat this as an app
+//var controller;
+//if (process.env.TOKEN || process.env.SLACK_TOKEN) {
+//    console.log("custom integration");
+//   //Treat this as a custom integration
+//   var customIntegration = require('./lib/custom_integrations');
+//   var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
+//   controller = customIntegration.configure(token, config, onInstallation);
+//} else {
+//    console.log("multi team");
+//   //Treat this as an app
+//   var app = require('./lib/apps');
+//   controller = app.configure(config, onInstallation);
+//} 
    var app = require('./lib/apps');
-   controller = app.configure(config, onInstallation);
-} 
-
+   var controller = app.configure(config, onInstallation);
 
 
 /**
