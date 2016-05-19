@@ -60,10 +60,23 @@ if (process.env.MONGOLAB_URI) {
 ////    process.exit(1);
 ////} 
 
-var app = require('./lib/apps');
-var customIntegration = require('./lib/custom_integrations');
-var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
-var controller = customIntegration.configure(token, config, onInstallation);
+//var app = require('./lib/apps');
+//var customIntegration = require('./lib/custom_integrations');
+//var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
+//var controller = customIntegration.configure(token, config, onInstallation);
+
+if (process.env.TOKEN || process.env.SLACK_TOKEN) {
+   //Treat this as a custom integration
+   var customIntegration = require('./lib/custom_integrations');
+   var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
+   var controller = customIntegration.configure(token, config, onInstallation);
+} else {
+   //Treat this as an app
+   var app = require('./lib/apps');
+   var controller = app.configure(config, onInstallation);
+} 
+
+
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
