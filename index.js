@@ -6,7 +6,8 @@
 // Libraries
 var https = require('https');
 var BotConfig = require('./config.json');
-//var beepboop = require('beepboop-botkit').start(controller, { debug: true });
+var Botkit = require("botkit");
+var beepboop = require("beepboop-botkit");
 
 var authTokenEncrypted = BotConfig.auth_token;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
@@ -45,27 +46,8 @@ if (process.env.MONGOLAB_URI) {
     };
 }
 
-//var controller;
-//if (process.env.TOKEN || process.env.SLACK_TOKEN) {
-//    console.log("custom integration");
-//   //Treat this as a custom integration
-//   var customIntegration = require('./lib/custom_integrations');
-//   var token = (process.env.TOKEN) ? process.env.TOKEN : process.env.SLACK_TOKEN;
-//   controller = customIntegration.configure(token, config, onInstallation);
-//} else {
-//    console.log("multi team");
-//   //Treat this as an app
-//   var app = require('./lib/apps');
-//   controller = app.configure(config, onInstallation);
-//} 
-//   var app = require('./lib/apps');
-//   var controller = app.configure(config, onInstallation);
-
-var Botkit = require("botkit");
-var beepboop = require("beepboop-botkit");
 
 var token = process.env.SLACK_TOKEN
-
 var controller = Botkit.slackbot({
   debug: false
 });
@@ -83,9 +65,6 @@ if (token) {
   console.log("Starting in Beep Boop multi-team mode")
   require('beepboop-botkit').start(controller, { debug: true })
 }
-
-
-
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
