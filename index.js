@@ -54,10 +54,10 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
     //Treat this as an app
 //    var app = require('./lib/apps');
 //    var controller = app.configure(process.env.PORT, process.env.CLIENT_ID, process.env.CLIENT_SECRET, config, onInstallation);
-} else {
-    console.log('Error: If this is a custom integration, please specify TOKEN in the environment. If this is an app, please specify CLIENTID, CLIENTSECRET, and PORT in the environment');
-    process.exit(1);
-}
+//} else {
+//    console.log('Error: If this is a custom integration, please specify TOKEN in the environment. If this is an app, please specify CLIENTID, CLIENTSECRET, and PORT in the environment');
+//    process.exit(1);
+//}
 
 
 /**
