@@ -26,6 +26,6 @@ config:
   - name: MAX_PAGE_COUNT
     friendly_name:  Max Page Count
     info: Max Page Count for repos to display (max 100)
-    default: 15
+    default: 25
     type: text
     global: true
