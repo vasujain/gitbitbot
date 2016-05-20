@@ -20,6 +20,9 @@ console.log(REPO_ORG);
 console.log(GITHUB_API_URL);
 console.log(GITHUB_AUTH_TOKEN);
 console.log(MAX_PAGE_COUNT);
+console.log(process);
+console.log(process.env);
+
 
 
 var authTokenEncrypted = BotConfig.auth_token;
