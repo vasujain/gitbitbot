@@ -1,7 +1,7 @@
 {
     "repo_org" : "DeveloperPlatform-R/",
     "github_api_url" : "https://github.paypal.com/api/v3/",
-    "auth_token" : "token f3087c84f537e6d3d0b1621c6b15482d44ce4347",
+    "auth_token" : "ZjMwODdjODRmNTM3ZTZkM2QwYjE2MjFjNmIxNTQ4MmQ0NGNlNDM0Nw==",
     "max_page_count": "100",
     "disable_zero_pr_repo": "true",
     "repos" : {
