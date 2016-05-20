@@ -9,7 +9,7 @@ GitBit Slack Bot is a Bot for Slack teams that they can configure and quickly ha
 ## Setup Instructions
 1. Fork this project.
 2. Open up your favorite terminal app, and clone your new repository to your local computer.
-3. This is a Node.js project, so you’ll need to install the various dependencies by running: npm install to get all the node_modules
+3. This is a Node.js project, so you’ll need to install the various dependencies by running: `npm install` to get all the node_modules
 4. Rename `config.clone.json` to `config.json`. Update Organization/Repositories in `config.json`.
 5. Add a bot Integration to your slack channel at https://{{$slack_channel}}.slack.com/apps/new/A0F7YS25R-bots
 6. From the terminal you can run your bot easily:
