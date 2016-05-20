@@ -7,7 +7,7 @@
 var https = require('https');
 var BotConfig = require('./config.json');
 var Botkit = require("botkit");
-//var beepboop = require("beepboop-botkit");
+var beepboop = require("beepboop-botkit");
 
 var authTokenEncrypted = BotConfig.auth_token;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
@@ -52,7 +52,7 @@ var controller = Botkit.slackbot({
   debug: false
 });
 
-//token = "xoxb-42527603590-UeWnhGWNKGwZEgviMiEhRK7a";
+token = "xoxb-42527603590-IiS5q8EQtMkUsTuukMYPMDLF";
 
 if (token) {
   console.log("Starting in single-team mode")
@@ -60,27 +60,29 @@ if (token) {
     token: token
   }).startRTM(function(err,bot,payload) {
     if (err) {
+          console.log(err);
+
       throw new Error(err);
     }
   });
 } else {
   console.log("Starting in Beep Boop multi-team mode")
-  var beepboopboop = require('beepboop-botkit').start(controller, { debug: true })
+  require('beepboop-botkit').start(controller, { debug: true })
 }
 
-beepboopboop.on('add_resource', function(message) {
- console.log('received request to add bot to team');
- REPO_ORG = message.resource.REPO_ORG;
- GITHUB_API_URL = message.resource.GITHUB_API_URL;
- GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
- MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
-    
-console.log("REPO_ORG--" + REPO_ORG);
-console.log("GITHUB_API_URL--" + GITHUB_API_URL);
-console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
-console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
-    
-});
+//beepboopboop.on('add_resource', function(message) {
+// console.log('received request to add bot to team');
+// REPO_ORG = message.resource.REPO_ORG;
+// GITHUB_API_URL = message.resource.GITHUB_API_URL;
+// GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
+// MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
+//    
+//console.log("REPO_ORG--" + REPO_ORG);
+//console.log("GITHUB_API_URL--" + GITHUB_API_URL);
+//console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
+//console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+//    
+//});
 
 //Checking config 
 //var REPO_ORG = process.env.REPO_ORG;
@@ -170,7 +172,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
-    console.log(body);
+//    console.log(body);
     var repoSource = ":shipit: " + BotConfig.repo_org + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
