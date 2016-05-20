@@ -9,6 +9,19 @@ var BotConfig = require('./config.json');
 var Botkit = require("botkit");
 var beepboop = require("beepboop-botkit");
 
+//Checking config 
+
+var REPO_ORG = process.env.REPO_ORG;
+var GITHUB_API_URL = process.env.GITHUB_API_URL;
+var GITHUB_AUTH_TOKEN = process.env.GITHUB_AUTH_TOKEN;
+var MAX_PAGE_COUNT = process.env.MAX_PAGE_COUNT;
+
+console.log(REPO_ORG);
+console.log(GITHUB_API_URL);
+console.log(GITHUB_AUTH_TOKEN);
+console.log(MAX_PAGE_COUNT);
+
+
 var authTokenEncrypted = BotConfig.auth_token;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
 
