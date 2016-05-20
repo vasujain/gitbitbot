@@ -16,15 +16,6 @@ var GITHUB_API_URL = process.env.GITHUB_API_URL;
 var GITHUB_AUTH_TOKEN = process.env.GITHUB_AUTH_TOKEN;
 var MAX_PAGE_COUNT = process.env.MAX_PAGE_COUNT;
 
-console.log(REPO_ORG);
-console.log(GITHUB_API_URL);
-console.log(GITHUB_AUTH_TOKEN);
-console.log(MAX_PAGE_COUNT);
-console.log(process);
-console.log(process.env);
-
-
-
 var authTokenEncrypted = BotConfig.auth_token;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
 
@@ -110,6 +101,14 @@ controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'di
 });
 
 controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log(REPO_ORG);
+console.log(GITHUB_API_URL);
+console.log(GITHUB_AUTH_TOKEN);
+console.log(MAX_PAGE_COUNT);
+console.log(process);
+console.log(process.env);
+    
+    
     var repo = message.match[1];
     if (typeof repo !== 'undefined' && repo) {
         var githubRepo = BotConfig.repos[repo];
