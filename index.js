@@ -10,7 +10,6 @@ var Botkit = require("botkit");
 var beepboop = require("beepboop-botkit");
 
 //Checking config 
-
 var REPO_ORG = process.env.REPO_ORG;
 var GITHUB_API_URL = process.env.GITHUB_API_URL;
 var GITHUB_AUTH_TOKEN = process.env.GITHUB_AUTH_TOKEN;
@@ -106,6 +105,7 @@ console.log("GITHUB_API_URL--" + GITHUB_API_URL);
 console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
 console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
 console.log("process.env--" + process.env);
+console.log("REPO_ORGv--" + process.env.REPO_ORG);
     
     
     var repo = message.match[1];
