@@ -7,13 +7,7 @@
 var https = require('https');
 var BotConfig = require('./config.json');
 var Botkit = require("botkit");
-var beepboop = require("beepboop-botkit");
-
-//Checking config 
-var REPO_ORG = process.env.REPO_ORG;
-var GITHUB_API_URL = process.env.GITHUB_API_URL;
-var GITHUB_AUTH_TOKEN = process.env.GITHUB_AUTH_TOKEN;
-var MAX_PAGE_COUNT = process.env.MAX_PAGE_COUNT;
+//var beepboop = require("beepboop-botkit");
 
 var authTokenEncrypted = BotConfig.auth_token;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
@@ -71,8 +65,39 @@ if (token) {
   });
 } else {
   console.log("Starting in Beep Boop multi-team mode")
-  require('beepboop-botkit').start(controller, { debug: true })
+  var beepboopboop = require('beepboop-botkit').start(controller, { debug: true })
 }
+
+beepboopboop.on('add_resource', function(message) {
+ console.log('received request to add bot to team');
+ REPO_ORG = message.resource.REPO_ORG;
+ GITHUB_API_URL = message.resource.GITHUB_API_URL;
+ GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
+ MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
+    
+console.log("REPO_ORG--" + REPO_ORG);
+console.log("GITHUB_API_URL--" + GITHUB_API_URL);
+console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
+console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+    
+});
+
+//Checking config 
+//var REPO_ORG = process.env.REPO_ORG;
+//var GITHUB_API_URL = process.env.GITHUB_API_URL;
+//var GITHUB_AUTH_TOKEN = process.env.GITHUB_AUTH_TOKEN;
+//var MAX_PAGE_COUNT = process.env.MAX_PAGE_COUNT;
+//
+//
+//console.log("REPO_ORG--" + REPO_ORG);
+//console.log("GITHUB_API_URL--" + GITHUB_API_URL);
+//console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
+//console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+//console.log("process.env--" + process.env);
+//console.log("REPO_ORGv--" + process.env.REPO_ORG);
+
+
+
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
@@ -102,14 +127,6 @@ controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'di
 });
 
 controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-console.log("REPO_ORG--" + REPO_ORG);
-console.log("GITHUB_API_URL--" + GITHUB_API_URL);
-console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
-console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
-console.log("process.env--" + process.env);
-console.log("REPO_ORGv--" + process.env.REPO_ORG);
-    
-    
     var repo = message.match[1];
     if (typeof repo !== 'undefined' && repo) {
         var githubRepo = BotConfig.repos[repo];
