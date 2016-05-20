@@ -58,6 +58,8 @@ var controller = Botkit.slackbot({
   debug: false
 });
 
+token = "xoxb-42527603590-UeWnhGWNKGwZEgviMiEhRK7a";
+
 if (token) {
   console.log("Starting in single-team mode")
   controller.spawn({
@@ -151,6 +153,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
+    console.log(body);
     var repoSource = ":shipit: " + BotConfig.repo_org + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
