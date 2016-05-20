@@ -137,7 +137,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
-    var repoSource = BotConfig.repo_org + repo + " Open Pull Requests : ";
+    var repoSource = ":construction:" + BotConfig.repo_org + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
     var objLength = obj.length;
