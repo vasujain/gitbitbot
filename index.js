@@ -153,7 +153,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
         }
     } else {
         for (var i = 0; i < objLength; i++) {
-            response += "\nPR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
+            response += "\n :shipit: PR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
         }
         bot.reply(message, {
             "attachments": [{
