@@ -101,12 +101,11 @@ controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'di
 });
 
 controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-    console.log(REPO_ORG);
-console.log(GITHUB_API_URL);
-console.log(GITHUB_AUTH_TOKEN);
-console.log(MAX_PAGE_COUNT);
-console.log(process);
-console.log(process.env);
+console.log("REPO_ORG--" + REPO_ORG);
+console.log("GITHUB_API_URL--" + GITHUB_API_URL);
+console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
+console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+console.log("process.env--" + process.env);
     
     
     var repo = message.match[1];
