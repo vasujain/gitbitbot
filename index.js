@@ -52,7 +52,7 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-token = "xoxb-42527603590-IiS5q8EQtMkUsTuukMYPMDLF";
+//token = "xoxb-42527603590-IiS5q8EQtMkUsTuukMYPMDLF";
 
 if (token) {
     console.log("Starting in single-team mode")
