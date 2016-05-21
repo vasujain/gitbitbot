@@ -49,57 +49,41 @@ if (process.env.MONGOLAB_URI) {
 
 var token = process.env.SLACK_TOKEN
 var controller = Botkit.slackbot({
-  debug: false
+    debug: false
 });
 
 token = "xoxb-42527603590-IiS5q8EQtMkUsTuukMYPMDLF";
 
 if (token) {
-  console.log("Starting in single-team mode")
-  controller.spawn({
-    token: token
-  }).startRTM(function(err,bot,payload) {
-    if (err) {
-          console.log(err);
+    console.log("Starting in single-team mode")
+    controller.spawn({
+        token: token
+    }).startRTM(function(err, bot, payload) {
+        if (err) {
+            console.log(err);
 
-      throw new Error(err);
-    }
-  });
+            throw new Error(err);
+        }
+    });
 } else {
-  console.log("Starting in Beep Boop multi-team mode")
-  require('beepboop-botkit').start(controller, { debug: true })
+    console.log("Starting in Beep Boop multi-team mode")
+    var beepboopboop = require('beepboop-botkit').start(controller, {
+        debug: true
+    })
+    beepboopboop.on('add_resource', function(message) {
+        console.log('received request to add bot to team');
+        REPO_ORG = message.resource.REPO_ORG;
+        GITHUB_API_URL = message.resource.GITHUB_API_URL;
+        GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
+        MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
+
+        console.log("REPO_ORG--" + REPO_ORG);
+        console.log("GITHUB_API_URL--" + GITHUB_API_URL);
+        console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
+        console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+
+    });
 }
-
-//beepboopboop.on('add_resource', function(message) {
-// console.log('received request to add bot to team');
-// REPO_ORG = message.resource.REPO_ORG;
-// GITHUB_API_URL = message.resource.GITHUB_API_URL;
-// GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
-// MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
-//    
-//console.log("REPO_ORG--" + REPO_ORG);
-//console.log("GITHUB_API_URL--" + GITHUB_API_URL);
-//console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
-//console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
-//    
-//});
-
-//Checking config 
-//var REPO_ORG = process.env.REPO_ORG;
-//var GITHUB_API_URL = process.env.GITHUB_API_URL;
-//var GITHUB_AUTH_TOKEN = process.env.GITHUB_AUTH_TOKEN;
-//var MAX_PAGE_COUNT = process.env.MAX_PAGE_COUNT;
-//
-//
-//console.log("REPO_ORG--" + REPO_ORG);
-//console.log("GITHUB_API_URL--" + GITHUB_API_URL);
-//console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
-//console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
-//console.log("process.env--" + process.env);
-//console.log("REPO_ORGv--" + process.env.REPO_ORG);
-
-
-
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
@@ -172,7 +156,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
-//    console.log(body);
+    //    console.log(body);    
     var repoSource = ":shipit: " + BotConfig.repo_org + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
@@ -196,7 +180,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
                 "fallback": repoSource,
                 "color": "#36a64f",
                 "title": repoSource,
-//                "title_link": BotConfig.github_api_url + 'repos/' + BotConfig.repo_org + repo ,
+                //                "title_link": BotConfig.github_api_url + 'repos/' + BotConfig.repo_org + repo ,
                 "text": response
             }]
         });
