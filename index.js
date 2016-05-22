@@ -54,6 +54,7 @@ var REPO_ORG = BotConfig.repo_org;
 var GITHUB_API_URL = BotConfig.github_api_url;
 var GITHUB_AUTH_TOKEN = BotConfig.auth_token;
 var MAX_PAGE_COUNT = BotConfig.max_page_count;
+var DISABLE_ZERO_PR_REPO = BotConfig.disable_zero_pr_repo;
 var authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
 
 if (token) {
@@ -78,6 +79,7 @@ if (token) {
         GITHUB_API_URL = message.resource.GITHUB_API_URL;
         GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
+        DISABLE_ZERO_PR_REPO = message.resource.DISABLE_ZERO_PR_REPO;
         authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
     });
 }
@@ -154,7 +156,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     var obj = JSON.parse(body);
     var objLength = obj.length;
     if (objLength == 0) {
-        if (!BotConfig.disable_zero_pr_repo) { //if false, then only display Repo with Zero PR 
+        if (!DISABLE_ZERO_PR_REPO) { //if false, then only display Repo with Zero PR 
             response = repoSource;
             if (flagZeroPRComment) {
                 response += "No open PR's @ the moment ! Are you guys coding ?"

@@ -16,12 +16,17 @@ config:
     default: https://github.com/api/v3/
     type: text
   - name: GITHUB_AUTH_TOKEN
-    friendly_name:  Authorization Token
-    info: Github API Authorization Token
-    default: token {{token$}}
+    friendly_name:  Authorization Token (Base64)
+    info: Base64 encoded value for of Github API Authorization Token
+    default: {{b64_token$}}
     type: secret
   - name: MAX_PAGE_COUNT
     friendly_name:  Max Page Count
     info: Max Page Count for repos to display (max 100)
     default: 25
+    type: text
+  - name: DISABLE_ZERO_PR_REPO
+    friendly_name:  Disable Repo with Zero PR  
+    info: Disable printing details for Repo with Zero Pull Requests 
+    default: true
     type: text
