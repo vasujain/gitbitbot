@@ -228,5 +228,4 @@ function botErrorHandler(err, bot, message) {
             "text": errText
         }]
     });
-    process.exit(1);
 }
