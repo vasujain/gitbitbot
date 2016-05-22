@@ -71,6 +71,7 @@ if (token) {
     var beepboopboop = require('beepboop-botkit').start(controller, {
         debug: true
     });
+    //Not working :(
     beepboopboop.on('add_resource', function(message) {
         console.log("Loading config parameters from Custom bot Config")
         REPO_ORG = message.resource.REPO_ORG;
@@ -79,7 +80,7 @@ if (token) {
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
     });
 }
-console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL + "GITHUB_AUTH_TOKEN-" + GITHUB_AUTH_TOKEN + "MAX_PAGE_COUNT-" + MAX_PAGE_COUNT);
+console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL + " GITHUB_AUTH_TOKEN-" + GITHUB_AUTH_TOKEN + " MAX_PAGE_COUNT-" + MAX_PAGE_COUNT);
 
 var authTokenEncrypted = GITHUB_AUTH_TOKEN;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");

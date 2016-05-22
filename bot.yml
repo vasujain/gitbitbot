@@ -10,22 +10,18 @@ config:
     info: Organization for whioch you want to pull up Repositorys
     default: paypal/
     type: text
-    global: true
   - name: GITHUB_API_URL
     friendly_name:  Github API URL
     info: Github API URL
     default: https://github.com/api/v3/
     type: text
-    global: true
   - name: GITHUB_AUTH_TOKEN
     friendly_name:  Authorization Token
     info: Github API Authorization Token
     default: token {{token$}}
     type: secret
-    global: true
   - name: MAX_PAGE_COUNT
     friendly_name:  Max Page Count
     info: Max Page Count for repos to display (max 100)
     default: 25
     type: text
-    global: true
