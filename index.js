@@ -79,7 +79,7 @@ if (token) {
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
     });
 }
-console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL);
+console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL + "GITHUB_AUTH_TOKEN-" + GITHUB_AUTH_TOKEN + "MAX_PAGE_COUNT-" + MAX_PAGE_COUNT);
 
 var authTokenEncrypted = GITHUB_AUTH_TOKEN;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
@@ -230,4 +230,5 @@ function botErrorHandler(err, bot, message) {
             "text": errText
         }]
     });
+    process.exit(1);
 }
