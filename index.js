@@ -186,7 +186,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
 function getListOfAllGithubReposInOrg(bot, message) {
     console.log("Getting list of all Github Repos in an Org. Can be 100+....");
     var ghArray = new Array();
-    var url = GITHUB_API_URL + 'orgs/' + BotConfig.repo_org + 'repos?per_page=' + MAX_PAGE_COUNT;
+    var url = GITHUB_API_URL + 'orgs/' + REPO_ORG + 'repos?per_page=' + MAX_PAGE_COUNT;
     console.log(url);
     var request = require('request');
     request({
