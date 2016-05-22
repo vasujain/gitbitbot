@@ -9,18 +9,6 @@ var BotConfig = require('./config.json');
 var Botkit = require("botkit");
 var beepboop = require("beepboop-botkit");
 
-var REPO_ORG = BotConfig.repo_org;
-var GITHUB_API_URL = BotConfig.github_api_url;
-var GITHUB_AUTH_TOKEN = BotConfig.auth_token;
-var MAX_PAGE_COUNT = BotConfig.max_page_count;
-
-var authTokenEncrypted = GITHUB_AUTH_TOKEN;
-//var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
-// For Node.js v5.11.1 and below
-var buf = new Buffer(authTokenEncrypted, 'base64');
-var authTokenDecrypted = "token " + buf.toString("ascii");
-var cutom_config_enabled = false; 
-
 function onInstallation(bot, installer) {
     if (installer) {
         bot.startPrivateConversation({
@@ -51,25 +39,28 @@ if (process.env.MONGOLAB_URI) {
     };
 }
 
-
 var token = process.env.SLACK_TOKEN
 var controller = Botkit.slackbot({
     debug: false
 });
 
-//token = "xoxb-42527603590-IiS5q8EQtMkUsTuukMYPMDLF";
+slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
+var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
+var token = slackTokenBuf.toString("ascii");
+console.log(token);
+
+//default config variable would be read from config.json, would be overwrite, if custom config found
+var REPO_ORG = BotConfig.repo_org;
+var GITHUB_API_URL = BotConfig.github_api_url;
+var GITHUB_AUTH_TOKEN = BotConfig.auth_token;
+var MAX_PAGE_COUNT = BotConfig.max_page_count;
 
 if (token) {
     console.log("Starting in single-team mode")
     controller.spawn({
         token: token
     }).startRTM(function(err, bot, payload) {
-        //Env is local/Single-team or custom config fails, read from config. json 
-        console.log("Loading config parameters from config.json ")
-        REPO_ORG = BotConfig.repo_org;
-        GITHUB_API_URL = BotConfig.github_api_url;
-        GITHUB_AUTH_TOKEN = BotConfig.auth_token;
-        MAX_PAGE_COUNT = BotConfig.max_page_count;
+        console.log("Loaded config parameters from config.json ")
         if (err) {
             console.log(err);
             throw new Error(err);
@@ -88,21 +79,17 @@ if (token) {
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
     });
 }
-
 console.log("REPO_ORG--" + REPO_ORG);
 console.log("GITHUB_API_URL--" + GITHUB_API_URL);
 console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
 console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
 
+var authTokenEncrypted = GITHUB_AUTH_TOKEN;
+//var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
+// For Node.js v5.11.1 and below
+var buf = new Buffer(authTokenEncrypted, 'base64');
+var authTokenDecrypted = "token " + buf.toString("ascii");
 
-/**
- * A demonstration for how to handle websocket events. In this case, just log when we have and have not
- * been disconnected from the websocket. In the future, it would be super awesome to be able to specify
- * a reconnect policy, and do reconnections automatically. In the meantime, we aren't going to attempt reconnects,
- * WHICH IS A B0RKED WAY TO HANDLE BEING DISCONNECTED. So we need to fix this.
- *
- * TODO: fixed b0rked reconnect behavior
- */
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function(bot) {
     console.log('** The RTM api just connected!');
@@ -190,7 +177,6 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
                 "fallback": repoSource,
                 "color": "#36a64f",
                 "title": repoSource,
-                //                "title_link": BotConfig.github_api_url + 'repos/' + BotConfig.repo_org + repo ,
                 "text": response
             }]
         });
