@@ -44,10 +44,10 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
-var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
-var token = slackTokenBuf.toString("ascii");
-console.log(token);
+//slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
+//var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
+//var token = slackTokenBuf.toString("ascii");
+//console.log(token);
 
 //default config variable would be read from config.json, would be overwrite, if custom config found
 var REPO_ORG = BotConfig.repo_org;
@@ -79,10 +79,7 @@ if (token) {
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
     });
 }
-console.log("REPO_ORG--" + REPO_ORG);
-console.log("GITHUB_API_URL--" + GITHUB_API_URL);
-console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
-console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL);
 
 var authTokenEncrypted = GITHUB_AUTH_TOKEN;
 //var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
@@ -124,10 +121,10 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
         } else if (repo == 'all') {
             getListOfAllGithubReposInOrg(bot, message);
         } else {
-            bot.reply(message, "Invalid Repo or Repo not configured");
+            botErrorHandler("Invalid Repo or Repo not configured", bot, message);
         }
     } else {
-        bot.reply(message, "Repo is undefined -- Invalid request or Repo not configured");
+        botErrorHandler("Repo is undefined -- Invalid request or Repo not configured", bot, message);
     }
 });
 
@@ -201,7 +198,10 @@ function getListOfAllGithubReposInOrg(bot, message) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-        ghArray = constructAllGithubRepoObject(body, bot, message);
+        if (err)
+            botErrorHandler(err, bot, message);
+        else
+            ghArray = constructAllGithubRepoObject(body, bot, message);
     });
     console.log("getListOfAllGithubReposInOrg executed successfully.\n");
 }
@@ -217,4 +217,17 @@ function constructAllGithubRepoObject(body, bot, message) {
         githubGetPullRequest(obj[i].name, bot, message, false);
     }
     console.log("constructAllGithubRepoObject executed successfully.\n");
+}
+
+function botErrorHandler(err, bot, message) {
+    console.log("\n" + err);
+    var errText = ":rotating_light: " + err;
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": err,
+            "color": "#FF0000",
+            "title": Error,
+            "text": errText
+        }]
+    });
 }
