@@ -54,6 +54,7 @@ var REPO_ORG = BotConfig.repo_org;
 var GITHUB_API_URL = BotConfig.github_api_url;
 var GITHUB_AUTH_TOKEN = BotConfig.auth_token;
 var MAX_PAGE_COUNT = BotConfig.max_page_count;
+var authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
 
 if (token) {
     console.log("Starting in single-team mode")
@@ -71,22 +72,17 @@ if (token) {
     var beepboopboop = require('beepboop-botkit').start(controller, {
         debug: true
     });
-    //Not working :(
     beepboopboop.on('add_resource', function(message) {
         console.log("Loading config parameters from Custom bot Config")
         REPO_ORG = message.resource.REPO_ORG;
         GITHUB_API_URL = message.resource.GITHUB_API_URL;
         GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
+        authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
     });
 }
-console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL + " GITHUB_AUTH_TOKEN-" + GITHUB_AUTH_TOKEN + " MAX_PAGE_COUNT-" + MAX_PAGE_COUNT);
-
-var authTokenEncrypted = GITHUB_AUTH_TOKEN;
-//var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
-// For Node.js v5.11.1 and below
-var buf = new Buffer(authTokenEncrypted, 'base64');
-var authTokenDecrypted = "token " + buf.toString("ascii");
+//For debugging purposes
+//console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL);
 
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function(bot) {
@@ -144,6 +140,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
+//        console.log("repo + body" + repo + body);   //For debugging purposes
         parseAndResponse(body, bot, message, repo, flagZeroPRComment);
     });
 }
