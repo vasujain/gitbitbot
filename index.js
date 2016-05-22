@@ -9,12 +9,17 @@ var BotConfig = require('./config.json');
 var Botkit = require("botkit");
 var beepboop = require("beepboop-botkit");
 
-var authTokenEncrypted = BotConfig.auth_token;
-//var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
+var REPO_ORG = BotConfig.repo_org;
+var GITHUB_API_URL = BotConfig.github_api_url;
+var GITHUB_AUTH_TOKEN = BotConfig.auth_token;
+var MAX_PAGE_COUNT = BotConfig.max_page_count;
 
+var authTokenEncrypted = GITHUB_AUTH_TOKEN;
+//var authTokenDecrypted = "token " + Buffer.from(authTokenEncrypted, 'base64').toString("ascii");
 // For Node.js v5.11.1 and below
 var buf = new Buffer(authTokenEncrypted, 'base64');
 var authTokenDecrypted = "token " + buf.toString("ascii");
+var cutom_config_enabled = false; 
 
 function onInstallation(bot, installer) {
     if (installer) {
@@ -59,9 +64,14 @@ if (token) {
     controller.spawn({
         token: token
     }).startRTM(function(err, bot, payload) {
+        //Env is local/Single-team or custom config fails, read from config. json 
+        console.log("Loading config parameters from config.json ")
+        REPO_ORG = BotConfig.repo_org;
+        GITHUB_API_URL = BotConfig.github_api_url;
+        GITHUB_AUTH_TOKEN = BotConfig.auth_token;
+        MAX_PAGE_COUNT = BotConfig.max_page_count;
         if (err) {
             console.log(err);
-
             throw new Error(err);
         }
     });
@@ -69,21 +79,21 @@ if (token) {
     console.log("Starting in Beep Boop multi-team mode")
     var beepboopboop = require('beepboop-botkit').start(controller, {
         debug: true
-    })
+    });
     beepboopboop.on('add_resource', function(message) {
-        console.log('received request to add bot to team');
+        console.log("Loading config parameters from Custom bot Config")
         REPO_ORG = message.resource.REPO_ORG;
         GITHUB_API_URL = message.resource.GITHUB_API_URL;
         GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
-
-        console.log("REPO_ORG--" + REPO_ORG);
-        console.log("GITHUB_API_URL--" + GITHUB_API_URL);
-        console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
-        console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
-
     });
 }
+
+console.log("REPO_ORG--" + REPO_ORG);
+console.log("GITHUB_API_URL--" + GITHUB_API_URL);
+console.log("GITHUB_AUTH_TOKEN--" + GITHUB_AUTH_TOKEN);
+console.log("MAX_PAGE_COUNT--" + MAX_PAGE_COUNT);
+
 
 /**
  * A demonstration for how to handle websocket events. In this case, just log when we have and have not
@@ -138,7 +148,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
 function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
     console.log("Making a POST call to GITHUB API to fetch all OPEN PR's...");
     var request = require('request');
-    var url = BotConfig.github_api_url + 'repos/' + BotConfig.repo_org + repo + '/pulls?state=open';
+    var url = GITHUB_API_URL + 'repos/' + REPO_ORG + repo + '/pulls?state=open';
     console.log(url);
     request({
         headers: {
@@ -157,7 +167,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
     //    console.log(body);    
-    var repoSource = ":shipit: " + BotConfig.repo_org + repo + " Open Pull Requests : ";
+    var repoSource = ":shipit: " + REPO_ORG + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
     var objLength = obj.length;
@@ -193,7 +203,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
 function getListOfAllGithubReposInOrg(bot, message) {
     console.log("Getting list of all Github Repos in an Org. Can be 100+....");
     var ghArray = new Array();
-    var url = BotConfig.github_api_url + 'orgs/' + BotConfig.repo_org + 'repos?per_page=' + BotConfig.max_page_count;
+    var url = GITHUB_API_URL + 'orgs/' + BotConfig.repo_org + 'repos?per_page=' + MAX_PAGE_COUNT;
     console.log(url);
     var request = require('request');
     request({
