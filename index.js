@@ -131,7 +131,7 @@ controller.hears('help', ['direct_mention', 'mention', 'direct_message'], functi
     console.log("Help !! -- Listing all the supported commands ...");
     var helpMsg = ":point_right: Use the following commands to use GitBit.\n";
     var helpCommand = "";
-    helpCommand += ":pushpin: pr help - Gets list of all commands you can use with GitBit. \n";
+    helpCommand += ":pushpin: help - Gets list of all commands you can use with GitBit. \n";
     helpCommand += ":pushpin: pr custom - Gets pull request for all repos for your team customized in config.json. \n";
     helpCommand += ":pushpin: pr all - Gets pull request for all repos in your organization (Max result ssize defined in config). \n";
     bot.reply(message, {
