@@ -44,10 +44,10 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
-var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
-var token = slackTokenBuf.toString("ascii");
-console.log(token);
+//slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
+//var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
+//var token = slackTokenBuf.toString("ascii");
+//console.log(token);
 
 //default config variable would be read from config.json, would be overwrite, if custom config found
 var REPO_ORG = BotConfig.repo_org;
