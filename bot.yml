@@ -18,7 +18,7 @@ config:
   - name: GITHUB_AUTH_TOKEN
     friendly_name:  Authorization Token (Base64)
     info: Base64 encoded value for of Github API Authorization Token
-    default: {{b64_token$}}
+    default: b64_token
     type: secret
   - name: MAX_PAGE_COUNT
     friendly_name:  Max Page Count
