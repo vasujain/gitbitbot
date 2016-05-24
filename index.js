@@ -44,10 +44,10 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-//slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
-//var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
-//var token = slackTokenBuf.toString("ascii");
-//console.log(token);
+slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
+var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
+var token = slackTokenBuf.toString("ascii");
+console.log(token);
 
 //default config variable would be read from config.json, would be overwrite, if custom config found
 var REPO_ORG = BotConfig.repo_org;
@@ -127,6 +127,23 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
     }
 });
 
+controller.hears('help', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Help !! -- Listing all the supported commands ...");
+    var helpMsg = ":point_right: Use the following commands to use GitBit.\n";
+    var helpCommand = "";
+    helpCommand += ":pushpin: pr help - Gets list of all commands you can use with GitBit. \n";
+    helpCommand += ":pushpin: pr custom - Gets pull request for all repos for your team customized in config.json. \n";
+    helpCommand += ":pushpin: pr all - Gets pull request for all repos in your organization (Max result ssize defined in config). \n";
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": helpCommand,
+            "color": "#FFFF00",
+            "title": helpMsg,
+            "text": helpCommand
+        }]
+    });
+});
+
 // Make a POST call to GITHUB API to fetch all OPEN PR's
 function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
     console.log("Making a POST call to GITHUB API to fetch all OPEN PR's...");
@@ -142,7 +159,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-//        console.log("repo + body" + repo + body);   //For debugging purposes
+        //        console.log("repo + body" + repo + body);   //For debugging purposes
         parseAndResponse(body, bot, message, repo, flagZeroPRComment);
     });
 }
