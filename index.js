@@ -44,10 +44,10 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-//slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
-//var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
-//var token = slackTokenBuf.toString("ascii");
-//console.log(token);
+slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
+var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
+var token = slackTokenBuf.toString("ascii");
+console.log(token);
 
 //default config variable would be read from config.json, would be overwrite, if custom config found
 var REPO_ORG = BotConfig.repo_org;
@@ -115,6 +115,14 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
             githubGetPullRequest(githubRepo, bot, message, flagZeroPRComment);
         } else if (repo == 'custom') {
             for (var r in BotConfig.repos) {
+                githubGetPullRequest(BotConfig.repos[r], bot, message, flagZeroPRComment);
+            }
+        } else if (repo == 'pelican') {
+            for (var r in BotConfig.repos.pelican) {
+                githubGetPullRequest(BotConfig.repos[r], bot, message, flagZeroPRComment);
+            }
+        } else if (repo == 'caladrius') {
+            for (var r in BotConfig.repos.caladrius) {
                 githubGetPullRequest(BotConfig.repos[r], bot, message, flagZeroPRComment);
             }
         } else if (repo == 'all') {

@@ -1,17 +1,32 @@
 {
-    "repo_org" : "DeveloperPlatform-R/",
-    "github_api_url" : "https://github.paypal.com/api/v3/",
-    "auth_token" : "YTIwZDcyMDVjNDQyY2M4ODY5NGIwZjVlMWYyYjMyMDg0YWYwNTdkZQ==",
+    "repo_org": "DeveloperPlatform-R/",
+    "github_api_url": "https://github.paypal.com/api/v3/",
+    "auth_token": "YTIwZDcyMDVjNDQyY2M4ODY5NGIwZjVlMWYyYjMyMDg0YWYwNTdkZQ==",
     "max_page_count": "100",
     "disable_zero_pr_repo": "true",
-    "repos" : {
-        "amq" : "amqpaymentwebhookd",
-        "yam" : "yamwebhookd",
-        "wps" : "webhooksplatformserv",
-        "mps" : "webhookspublishserv",
-        "wcache" : "webhooks-cache",
-        "wmetrics" : "webhooks-metrics-publisher",
-        "alc" : "applifecyclemgmtserv",
-        "appmgmt" : "appmanagementapiserv"
+    "repos": {
+        "custom": [
+            "amqpaymentwebhookd",
+            "yamwebhookd",
+            "webhooksplatformserv",
+            "webhookspublishserv",
+            "webhooks-cache",
+            "webhooks-metrics-publisher",
+            "applifecyclemgmtserv",
+            "appmanagementapiserv"
+        ],
+        "pelican": [
+            "amqpaymentwebhookd",
+            "yamwebhookd",
+            "webhooksplatformserv",
+            "webhookspublishserv",
+            "webhooks-cache",
+            "webhooks-metrics-publisher"
+
+        ],
+        "caladrius": [
+            "applifecyclemgmtserv",
+            "appmanagementapiserv"
+        ]
     }
 }
