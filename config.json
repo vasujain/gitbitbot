@@ -5,28 +5,32 @@
     "max_page_count": "100",
     "disable_zero_pr_repo": "true",
     "repos": {
-        "custom": [
-            "amqpaymentwebhookd",
-            "yamwebhookd",
-            "webhooksplatformserv",
-            "webhookspublishserv",
-            "webhooks-cache",
-            "webhooks-metrics-publisher",
-            "applifecyclemgmtserv",
-            "appmanagementapiserv"
-        ],
-        "pelican": [
-            "amqpaymentwebhookd",
-            "yamwebhookd",
-            "webhooksplatformserv",
-            "webhookspublishserv",
-            "webhooks-cache",
-            "webhooks-metrics-publisher"
+        "teams": [{
+            "custom": [
+                "amqpaymentwebhookd",
+                "yamwebhookd",
+                "webhooksplatformserv",
+                "webhookspublishserv",
+                "webhooks-cache",
+                "webhooks-metrics-publisher",
+                "applifecyclemgmtserv",
+                "appmanagementapiserv"
+            ]
+        }, {
+            "pelican": [
+                "amqpaymentwebhookd",
+                "yamwebhookd",
+                "webhooksplatformserv",
+                "webhookspublishserv",
+                "webhooks-cache",
+                "webhooks-metrics-publisher"
 
-        ],
-        "caladrius": [
-            "applifecyclemgmtserv",
-            "appmanagementapiserv"
-        ]
+            ]
+        }, {
+            "caladrius": [
+                "applifecyclemgmtserv",
+                "appmanagementapiserv"
+            ]
+        }]
     }
 }
