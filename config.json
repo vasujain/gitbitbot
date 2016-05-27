@@ -32,5 +32,20 @@
                 "appmanagementapiserv"
             ]
         }]
+    },
+    "github-issues": {
+        "labels": ["api-webhooks"],
+        "organization": [{
+            "paypal": [
+                "PayPal-PHP-SDK",
+                "PayPal-Python-SDK",
+                "PayPal-Ruby-SDK",
+                "PayPal-Java-SDK",
+                "PayPal-node-SDK",
+                "PayPal-NET-SDK",
+                "PayPal-iOS-SDK",
+                "PayPal-Android-SDK"
+            ]
+        }]
     }
 }
