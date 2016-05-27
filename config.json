@@ -33,9 +33,9 @@
             ]
         }]
     },
-    "github-issues": {
+    "github_issues": {
         "labels": ["api-webhooks"],
-        "organization": [{
+        "organizations": [{
             "paypal": [
                 "PayPal-PHP-SDK",
                 "PayPal-Python-SDK",
