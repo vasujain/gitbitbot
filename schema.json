@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "GitBit Schema",
+  "description": "GitBit object with details of Repositories and config",
+  "properties": {
+    "repo_org": {
+      "type": "string",
+      "title": "Repo_org schema.",
+      "description": "Organization for Repos"
+    },
+    "github_api_url": {
+      "type": "string",
+      "title": "Github_api_url schema.",
+      "description": "Github api URL",
+      "default": "https://api.github.com/"
+    },
+    "auth_token": {
+      "type": "string",
+      "title": "Auth_token schema.",
+      "description": "Github Auth token for making Github API calls."
+    },
+    "max_page_count": {
+      "type": "string",
+      "title": "Max_page_count schema.",
+      "description": "Repo results page size, max 100",
+      "default": "25"
+    },
+    "disable_zero_pr_repo": {
+      "type": "string",
+      "title": "Disable_zero_pr_repo schema.",
+      "description": "Display details about Repo with zero PR",
+      "default": "true"
+    },
+    "repos": {
+      "type": "object",
+      "title": "Repos schema.",
+      "description": "Team to track, for e.g. a team with several repos",
+      "properties": {
+        "teams": {
+          "type": "array",
+          "title": "Teams schema.",
+          "description": "An explanation about the purpose of this instance.",
+          "items": {
+            "type": "object",
+            "title": "2 schema.",
+            "description": "An explanation about the purpose of this instance.",
+            "properties": {
+              "team_name": {
+                "type": "array",
+                "title": "team repo.",
+                "description": "Repos within a team",
+                "items": {
+                  "type": "string",
+                  "title": "Repo",
+                  "description": "Single repo within team"
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "teams"
+      ]
+    },
+    "github_issues": {
+      "type": "object",
+      "title": "Github_issues schema.",
+      "description": "Github Issues Object",
+      "properties": {
+        "labels": {
+          "type": "array",
+          "title": "Labels schema.",
+          "description": "An array of labels within repo issues",
+          "items": {
+            "type": "string",
+            "title": "label",
+            "description": "Label to track",
+            "default": "api-webhooks"
+          }
+        },
+        "organizations": {
+          "type": "array",
+          "title": "Organizations schema",
+          "description": "Organization object containing repos and org",
+          "items": {
+            "type": "object",
+            "title": "Organization array object",
+            "description": "multiple organization within github",
+            "properties": {
+              "organization_name": {
+                "type": "array",
+                "title": "Organizaion Repos",
+                "description": "Repos within an organizaion",
+                "items": {
+                  "type": "string",
+                  "title": "repo",
+                  "description": "a Github repo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "labels",
+        "organizations"
+      ]
+    }
+  },
+  "required": [
+    "repo_org",
+    "github_api_url",
+    "auth_token",
+    "max_page_count",
+    "disable_zero_pr_repo",
+    "repos",
+    "github_issues"
+  ]
+}
