@@ -51,11 +51,12 @@ var token = slackTokenBuf.toString("ascii");
 console.log(token);
 
 //default config variable would be read from config.json, would be overwrite, if custom config found
-var REPO_ORG = BotConfig.repo_org;
-var GITHUB_API_URL = BotConfig.github_api_url;
-var GITHUB_AUTH_TOKEN = BotConfig.auth_token;
-var MAX_PAGE_COUNT = BotConfig.max_page_count;
-var DISABLE_ZERO_PR_REPO = BotConfig.disable_zero_pr_repo;
+var REPO_ORG = BotConfig.github_pull_requests.repo_org;
+var GITHUB_API_URL = BotConfig.github_pull_requests.api_url;
+var GITHUB_ISSUES_API_URL = BotConfig.github_issues.api_url;
+var GITHUB_AUTH_TOKEN = BotConfig.github_pull_requests.auth_token;
+var MAX_PAGE_COUNT = BotConfig.github_pull_requests.max_page_count;
+var DISABLE_ZERO_PR_REPO = BotConfig.github_pull_requests.disable_zero_pr_repo;
 var authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
 
 if (token) {
@@ -110,13 +111,13 @@ controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'di
 controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     var repo = message.match[1];
     if (typeof repo !== 'undefined' && repo) {
-        var githubRepo = BotConfig.repos[repo];
+        var githubRepo = BotConfig.github_pull_requests.repos[repo];
         var flagZeroPRComment = false;
         //Check and throw error if team is invalid -- Object.keys(bb.repos.teams).length
-        if (isValidTeam(repo, Object.keys(BotConfig.repos.teams))) {
+        if (isValidTeam(repo, Object.keys(BotConfig.github_pull_requests.repos.teams))) {
             var key = repo,
                 teamRepos;
-            BotConfig.repos.teams.some((v) => Object.keys(v).indexOf(key) !== -1 && (teamRepos = v[key]), teamRepos);
+            BotConfig.github_pull_requests.repos.teams.some((v) => Object.keys(v).indexOf(key) !== -1 && (teamRepos = v[key]), teamRepos);
             teamRepos.forEach(function(teamRepo) {
                 githubGetPullRequest(teamRepo, bot, message, flagZeroPRComment);
             });
@@ -139,6 +140,7 @@ controller.hears('help', ['direct_mention', 'mention', 'direct_message'], functi
     helpCommand += ":pushpin: pr custom - Gets pull request for all repos for your custom team customized in config.json. \n";
     helpCommand += ":pushpin: pr all - Gets pull request for all repos in your organization (Max result ssize defined in config). \n";
     helpCommand += ":pushpin: github issues - Gets list of all issues in a repo in your organization woth specific issue-label. \n";
+    helpCommand += ":pushpin: dev - Get Developer details. \n";
     bot.reply(message, {
         "attachments": [{
             "fallback": helpCommand,
@@ -160,6 +162,23 @@ controller.hears('github issues', ['direct_mention', 'mention', 'direct_message'
     });
 });
 
+controller.hears('dev', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Dev !! -- Listing developer Details ...");
+    var devMsg = ":octocat: Dev Details \n";
+    var devCommand = "";
+    devCommand += ":tada: Bot brought to life by : Vasu Jain \n";
+    devCommand += ":tada: Github Repo : https://github.com/vasujain/gitbitbot. \n";
+    devCommand += ":tada: Bot Support : https://github.com/vasujain/gitbitbot/issues. \n";
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": devCommand,
+            "color": "#36A64F",
+            "title": devMsg,
+            "text": devCommand
+        }]
+    });
+});
+
 /* ************************* GITHUB FUNCTIONS ******************************** */
 // Make a POST call to GITHUB API to fetch all OPEN PR's
 function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
@@ -176,7 +195,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-        //        console.log("repo + body" + repo + body);   //For debugging purposes
+        //console.log("repo + body" + repo + body);   //For debugging purposes
         parseAndResponse(body, bot, message, repo, flagZeroPRComment);
     });
 }
@@ -184,7 +203,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 // Make a POST call to GITHUB API to fetch all Issues with specific Label's
 function githubGetIssuesWithLabel(repo, repoOrg, bot, message, label) {
     console.log("Making a GET call to GITHUB API to fetch all Issues With Label");
-    var url = 'https://api.github.com/' + 'repos/' + repoOrg + '/' + repo + '/issues?labels=' + label;
+    var url = GITHUB_ISSUES_API_URL + 'repos/' + repoOrg + '/' + repo + '/issues?labels=' + label;
     var request = require('request');
     request({
         headers: {
@@ -260,8 +279,7 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
             var issue_icon = "";
             if (obj[i].title == "open") {
                 issue_icon = ":no_entry:";
-            }
-            else {
+            } else {
                 issue_icon = ":white_check_mark:";
             }
             response += "\n " + issue_icon + " PR # " + obj[i].title + " - " + obj[i].number + " by " + obj[i].user.login;
@@ -322,7 +340,7 @@ function botErrorHandler(err, bot, message) {
 function isValidTeam(repo, teamObj) {
     var teamLength = teamObj.length;
     for (var i = 0; i < teamLength; i++) {
-        var teamStr = Object.keys(BotConfig.repos.teams[i]);
+        var teamStr = Object.keys(BotConfig.github_pull_requests.repos.teams[i]);
         if (teamStr == repo) {
             console.log("isValidRepo:true\n");
             return true;
