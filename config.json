@@ -1,5 +1,5 @@
 {
-    "version": "1.2",
+    "version": "1.3",
     "github_pull_requests": {
         "api_type": "corporate",
         "api_url": "https://github.paypal.com/api/v3/",
@@ -35,13 +35,14 @@
                     "appmanagementapiserv"
                 ]
             }]
-        }   
+        }
     },
     "github_issues": {
         "api_type": "public",
-        "api_url": "https://github.paypal.com/api/v3/",
-        "auth_token": "YTIwZDcyMDVjNDQyY2M4ODY5NGIwZjVlMWYyYjMyMDg0YWYwNTdkZQ==",
+        "api_url": "https://api.github.com/",
+        "auth_token": "YjM5MTg1Y2IwMGFmMjkzZDZmM2YyMjg2NDEzMjYwNTM1ZTc3N2Y3",
         "labels": ["api-webhooks"],
+        "issue_state": "all",
         "organizations": [{
             "paypal": [
                 "PayPal-PHP-SDK",
@@ -54,5 +55,14 @@
                 "PayPal-Android-SDK"
             ]
         }]
+    },
+    "stackoverflow": {
+        "api_key": "NA",
+        "api_url": "https://api.stackexchange.com/",
+        "order": "desc",
+        "sort": "activity",
+        "tag": "paypal",
+        "intitle": "webhooks",
+        "site": "stackoverflow"
     }
 }

@@ -53,11 +53,13 @@ console.log(token);
 //default config variable would be read from config.json, would be overwrite, if custom config found
 var REPO_ORG = BotConfig.github_pull_requests.repo_org;
 var GITHUB_API_URL = BotConfig.github_pull_requests.api_url;
-var GITHUB_ISSUES_API_URL = BotConfig.github_issues.api_url;
 var GITHUB_AUTH_TOKEN = BotConfig.github_pull_requests.auth_token;
 var MAX_PAGE_COUNT = BotConfig.github_pull_requests.max_page_count;
 var DISABLE_ZERO_PR_REPO = BotConfig.github_pull_requests.disable_zero_pr_repo;
 var authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
+var GITHUB_ISSUES_API_URL = BotConfig.github_issues.api_url;
+var GITHUB_ISSUES_STATE = BotConfig.github_issues.issue_state;
+
 
 if (token) {
     console.log("Starting in single-team mode");
@@ -100,6 +102,27 @@ controller.on('rtm_close', function(bot) {
 
 /* ************************* SLACK BOT CONTROLLER ******************************** */
 // Core bot logic !
+controller.hears('help', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Help !! -- Listing all the supported commands ...");
+    var helpMsg = ":point_right: Use the following commands to use GitBit.\n";
+    var helpCommand = "";
+    helpCommand += ":pushpin: help - Gets list of all commands you can use with GitBit. \n";
+    helpCommand += ":pushpin: pr {team_name} - Gets pull request for all repos for your team e.g. 'pr pelican'. \n";
+    helpCommand += ":pushpin: pr custom - Gets pull request for all repos for your custom team. \n";
+    helpCommand += ":pushpin: pr all - Gets pull request for all repos in your organization. \n";
+    helpCommand += ":pushpin: github issues - Gets list of all Github issues in a repo with issue-label. \n";
+    helpCommand += ":pushpin: sof issues - Get list of Stackoverflow questions with tag and intitle word. \n";
+    helpCommand += ":pushpin: dev - Get Developer details. \n";
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": helpCommand,
+            "color": "#FFFF00",
+            "title": helpMsg,
+            "text": helpCommand
+        }]
+    });
+});
+
 controller.on('bot_channel_join', function(bot, message) {
     bot.reply(message, "Thank you for inviting me to your Slack Channel!");
 });
@@ -131,35 +154,27 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
     }
 });
 
-controller.hears('help', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-    console.log("Help !! -- Listing all the supported commands ...");
-    var helpMsg = ":point_right: Use the following commands to use GitBit.\n";
-    var helpCommand = "";
-    helpCommand += ":pushpin: help - Gets list of all commands you can use with GitBit. \n";
-    helpCommand += ":pushpin: pr {team_name} - Gets pull request for all repos for your team customized in config.json. e.g. 'pr pelican' . \n";
-    helpCommand += ":pushpin: pr custom - Gets pull request for all repos for your custom team customized in config.json. \n";
-    helpCommand += ":pushpin: pr all - Gets pull request for all repos in your organization (Max result ssize defined in config). \n";
-    helpCommand += ":pushpin: github issues - Gets list of all issues in a repo in your organization woth specific issue-label. \n";
-    helpCommand += ":pushpin: dev - Get Developer details. \n";
-    bot.reply(message, {
-        "attachments": [{
-            "fallback": helpCommand,
-            "color": "#FFFF00",
-            "title": helpMsg,
-            "text": helpCommand
-        }]
-    });
-});
-
 controller.hears('github issues', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     console.log("GitHub issues !! ");
     var labels = BotConfig.github_issues.labels;
     var organizations = BotConfig.github_issues.organizations;
-    var repos = organizations[0].paypal;
-    var repoOrg = Object.keys(BotConfig.github_issues.organizations[0]);
-    repos.forEach(function(repo) {
-        githubGetIssuesWithLabel(repo, repoOrg, bot, message, labels[0]);
-    });
+    //TODO: Remove hard code
+    var orgSize = BotConfig.github_issues.organizations.length;
+    var repos = new Array();
+    for (var org = 0; org < orgSize; org++) {
+        var repoOrg = Object.keys(BotConfig.github_issues.organizations[org]);
+        var repos = BotConfig.github_issues.organizations[org].paypal;
+        console.log("repos:" + repos);
+        repos.forEach(function(repo) {
+            githubGetIssuesWithLabel(repo, repoOrg, bot, message, labels[0]);
+        });
+    }
+});
+
+controller.hears(['sof issues', 'stack overflow issues', 'stack_overflow issues'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Stack Overflow issues !! ");
+    getStackoverflowIssues(bot, message);
+    //http://api.stackexchange.com/2.2/search?order=desc&sort=activity&tagged=paypal&intitle=webhooks&site=stackoverflow
 });
 
 controller.hears('dev', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
@@ -203,7 +218,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
 // Make a POST call to GITHUB API to fetch all Issues with specific Label's
 function githubGetIssuesWithLabel(repo, repoOrg, bot, message, label) {
     console.log("Making a GET call to GITHUB API to fetch all Issues With Label");
-    var url = GITHUB_ISSUES_API_URL + 'repos/' + repoOrg + '/' + repo + '/issues?labels=' + label;
+    var url = GITHUB_ISSUES_API_URL + 'repos/' + repoOrg + '/' + repo + '/issues?labels=' + label + "&state=" + GITHUB_ISSUES_STATE;
     var request = require('request');
     request({
         headers: {
@@ -231,7 +246,34 @@ function constructAllGithubRepoObject(body, bot, message) {
     console.log("constructAllGithubRepoObject executed successfully.\n");
 }
 
-/* ************************* GITHUB API RESPONSE PARSERS ******************************** */
+function getStackoverflowIssues(bot, message) {
+    var zlib = require("zlib");    
+    var https = require('https'); //Use NodeJS https module
+    //'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&tagged=paypal&intitle=webhooks&site=stackoverflow';
+    var url = BotConfig.stackoverflow.api_url + '2.2/search' + '?order=' + BotConfig.stackoverflow.order + '&sort=' + BotConfig.stackoverflow.sort + '&tagged=' + BotConfig.stackoverflow.tag + '&intitle=' + BotConfig.stackoverflow.intitle + '&site=' + BotConfig.stackoverflow.site;
+    https.get(url, function(response) {
+        console.log("headers: ", response.headers);
+        console.log(response.statusCode)
+        if (response.statusCode == 200) {
+            var gunzip = zlib.createGunzip();
+            var jsonString = '';
+            response.pipe(gunzip);
+            gunzip.on('data', function(chunk) {
+                jsonString += chunk;
+            });
+            gunzip.on('end', function() {
+                parseAndResponseSOFJson(jsonString, bot, message, BotConfig.stackoverflow.tag);
+            });
+            gunzip.on('error', function(e) {
+                console.log(e);
+            });
+        } else {
+            console.log("Error");
+        }
+    });
+}
+
+/* ************************* API RESPONSE PARSERS ******************************** */
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
@@ -277,12 +319,12 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
     if (obj.length > 0) {
         for (var i = 0; i < objLength; i++) {
             var issue_icon = "";
-            if (obj[i].title == "open") {
+            if (obj[i].state == "open") {
                 issue_icon = ":no_entry:";
             } else {
                 issue_icon = ":white_check_mark:";
             }
-            response += "\n " + issue_icon + " PR # " + obj[i].title + " - " + obj[i].number + " by " + obj[i].user.login;
+            response += "\n " + issue_icon + " Issue # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
         }
         bot.reply(message, {
             "attachments": [{
@@ -295,6 +337,29 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
     }
     console.log(response);
     console.log("parseAndResponseIssuesJson for " + repo + " with " + objLength + " Issues'(s) executed successfully.");
+}
+
+function parseAndResponseSOFJson(body, bot, message, tag) {
+    var obj = JSON.parse(body);
+    var objLength = obj.items.length;
+    var sofHeader = ":fire_engine: Current Issues with label : " + BotConfig.stackoverflow.tag;
+    var response = "";
+    for (var i = 0; i < objLength; i++) {
+        if (obj.items[i].is_answered) {
+            response += ":white_check_mark:";
+        } else {
+            response += ":no_entry:";
+        }
+        response += obj.items[i].link + "\n"   ;
+    }
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": sofHeader,
+            "color": "#36a64f",
+            "title": sofHeader,
+            "text": response
+        }]
+    });
 }
 
 // Getting list of all Github Repos in an Org. Can be 100+. For the initial phase only top 100 results will display
