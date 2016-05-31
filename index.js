@@ -45,7 +45,7 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-var slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC0wakp0M3JoNEc5WDN5VmNNdU1HWXRBVWM=";
+var slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC1DZ21YWXMxNk1RdXYyeVE2YTFORG1nalc=";
 var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
 var token = slackTokenBuf.toString("ascii");
 console.log(token);
@@ -154,7 +154,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
     }
 });
 
-controller.hears('github issues', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['github issues', 'gh issues'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     console.log("GitHub issues !! ");
     var labels = BotConfig.github_issues.labels;
     var organizations = BotConfig.github_issues.organizations;
@@ -325,6 +325,7 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
                 issue_icon = ":white_check_mark:";
             }
             response += "\n " + issue_icon + " Issue # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
+            response += "\n " + obj[i].html_url;
         }
         bot.reply(message, {
             "attachments": [{
@@ -345,12 +346,14 @@ function parseAndResponseSOFJson(body, bot, message, tag) {
     var sofHeader = ":fire_engine: Current Issues with label : " + BotConfig.stackoverflow.tag;
     var response = "";
     for (var i = 0; i < objLength; i++) {
+        var issue_icon = "";
         if (obj.items[i].is_answered) {
-            response += ":white_check_mark:";
+            issue_icon += ":white_check_mark:";
         } else {
-            response += ":no_entry:";
+            issue_icon += ":no_entry:";
         }
-        response += obj.items[i].link + "\n"   ;
+        response += "\n " + issue_icon + " Question # " + obj.items[i].question_id + " - " + obj.items[i].title + " by " + obj.items[i].owner.display_name;
+        response += "\n " + obj.items[i].link;
     }
     bot.reply(message, {
         "attachments": [{
