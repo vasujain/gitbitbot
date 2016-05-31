@@ -6,9 +6,9 @@
     "properties": {
         "version": {
             "type": "string",
-            "title": "Version.",
+            "title": "Version",
             "description": "Version of the schema.",
-            "default": "1.2"
+            "default": "1.3"
         },
         "github_pull_requests": {
             "type": "object",
@@ -17,8 +17,8 @@
             "properties": {
                 "api_type": {
                     "type": "string",
-                    "title": "Api_type schema.",
-                    "description": "Github Instance type",
+                    "title": "Api_type",
+                    "description": "Github Instance type.",
                     "default": "public",
                     "enum": [
                         "public",
@@ -27,29 +27,29 @@
                 },
                 "api_url": {
                     "type": "string",
-                    "title": "Github_api_url schema.",
-                    "description": "Github api URL",
+                    "title": "Github_api_url",
+                    "description": "Github api URL.",
                     "default": "https://github.paypal.com/api/v3/"
                 },
                 "auth_token": {
                     "type": "string",
-                    "title": "Auth_token schema.",
+                    "title": "auth_token",
                     "description": "Github Auth token for making Github API calls."
                 },
                 "repo_org": {
                     "type": "string",
-                    "title": "Repo_org schema.",
-                    "description": "Organization for Repos"
+                    "title": "repo_org",
+                    "description": "Organization for Repos."
                 },
                 "max_page_count": {
                     "type": "string",
-                    "title": "Max_page_count schema.",
+                    "title": "Max_page_count",
                     "description": "Repo results page size, max 100.",
                     "default": "25"
                 },
                 "disable_zero_pr_repo": {
                     "type": "string",
-                    "title": "Disable_zero_pr_repo schema.",
+                    "title": "Disable_zero_pr_repo",
                     "description": "Display details about Repo with zero PR.",
                     "default": "true"
                 },
@@ -103,8 +103,8 @@
             "properties": {
                 "api_type": {
                     "type": "string",
-                    "title": "Api_type schema.",
-                    "description": "Github Instance type",
+                    "title": "Api_type",
+                    "description": "Github Instance type.",
                     "default": "public",
                     "enum": [
                         "public",
@@ -113,19 +113,30 @@
                 },
                 "api_url": {
                     "type": "string",
-                    "title": "Github_api_url schema.",
-                    "description": "Github api URL",
+                    "title": "Github_api_url",
+                    "description": "Github api URL.",
                     "default": "https://api.github.com/"
                 },
                 "auth_token": {
                     "type": "string",
-                    "title": "Auth_token schema.",
+                    "title": "Auth_token",
                     "description": "Github Auth token for making Github API calls."
+                },
+                "issue_state": {
+                    "type": "string",
+                    "title": "issue_state",
+                    "description": "Issue state for a Github Issue.",
+                    "default": "all",
+                    "enum": [
+                        "open",
+                        "closed",
+                        "all"
+                    ]
                 },
                 "labels": {
                     "type": "array",
-                    "title": "Labels schema.",
-                    "description": "An array of labels within repo issues",
+                    "title": "labels",
+                    "description": "An array of labels within repo issues.",
                     "items": {
                         "type": "string",
                         "title": "label",
@@ -135,7 +146,7 @@
                 },
                 "organizations": {
                     "type": "array",
-                    "title": "Organizations schema.",
+                    "title": "Organizations schema",
                     "description": "Organization object containing repos and org.",
                     "items": {
                         "type": "object",
@@ -163,11 +174,77 @@
                 "labels",
                 "organizations"
             ]
+        },
+        "stackoverflow": {
+            "type": "object",
+            "title": "Stackoverflow schema",
+            "description": "Stackoverflow schema".,
+            "properties": {
+                "api_key": {
+                    "type": "string",
+                    "title": "Api_key",
+                    "description": "Stackoverflow Api_key for making Stackoverflow API calls."
+                },
+                "api_url": {
+                    "type": "string",
+                    "title": "Stackoverflow Api_url",
+                    "description": "Stackoverflow api URL.",
+                    "default": "https://api.stackexchange.com/"
+                },
+                "order": {
+                    "type": "string",
+                    "title": "order",
+                    "description": "Order for results set.",
+                    "default": "desc",
+                    "enum": [
+                        "desc",
+                        "asc"
+                    ]
+                },
+                "sort": {
+                    "type": "string",
+                    "title": "sort",
+                    "description": "Sort parameter for result set.",
+                    "default": "activity",
+                    "enum": [
+                        "activity",
+                        "creation",
+                        "votes",
+                        "relevance"
+                    ]
+                },
+                "tag": {
+                    "type": "string",
+                    "title": "tag",
+                    "description": "tag is semi-colon delimited list of tags."
+                },
+                "intitle": {
+                    "type": "string",
+                    "title": "intitle ",
+                    "description": "intitle is semi-colon delimited list of question intitle text."
+                },
+                "site": {
+                    "type": "string",
+                    "title": "site",
+                    "description": "stackexchange api site to consume.",
+                    "default": "stackoverflow"
+                }
+            },
+            "required": [
+                "api_key",
+                "api_url",
+                "order",
+                "sort",
+                "tag",
+                "intitle",
+                "site"
+            ]
         }
     },
     "required": [
         "version",
         "github_pull_requests",
-        "github_issues"
+        "github_issues",
+        "stackoverflow"
     ]
 }
