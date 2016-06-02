@@ -158,7 +158,6 @@ controller.hears(['github issues', 'gh issues'], ['direct_mention', 'mention', '
     console.log("GitHub issues !! ");
     var labels = BotConfig.github_issues.labels;
     var organizations = BotConfig.github_issues.organizations;
-    //TODO: Remove hard code
     var orgSize = BotConfig.github_issues.organizations.length;
     var repos = new Array();
     for (var org = 0; org < orgSize; org++) {
@@ -174,7 +173,16 @@ controller.hears(['github issues', 'gh issues'], ['direct_mention', 'mention', '
 controller.hears(['sof issues', 'stack overflow issues', 'stack_overflow issues'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     console.log("Stack Overflow issues !! ");
     getStackoverflowIssues(bot, message);
-    //http://api.stackexchange.com/2.2/search?order=desc&sort=activity&tagged=paypal&intitle=webhooks&site=stackoverflow
+});
+
+controller.hears(['jira issues (.*)'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Jira issues !! ");
+    var assignee = message.match[1];
+    if (typeof assignee !== 'undefined' && assignee) {
+        getJiraIssues(bot, message, assignee);
+    } else {
+        botErrorHandler("assignee is undefined -- Invalid request or assignee does not exist", bot, message, assignee);
+    }
 });
 
 controller.hears('dev', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
@@ -247,7 +255,7 @@ function constructAllGithubRepoObject(body, bot, message) {
 }
 
 function getStackoverflowIssues(bot, message) {
-    var zlib = require("zlib");    
+    var zlib = require("zlib");
     var https = require('https'); //Use NodeJS https module
     //'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&tagged=paypal&intitle=webhooks&site=stackoverflow';
     var url = BotConfig.stackoverflow.api_url + '2.2/search' + '?order=' + BotConfig.stackoverflow.order + '&sort=' + BotConfig.stackoverflow.sort + '&tagged=' + BotConfig.stackoverflow.tag + '&intitle=' + BotConfig.stackoverflow.intitle + '&site=' + BotConfig.stackoverflow.site;
@@ -270,6 +278,23 @@ function getStackoverflowIssues(bot, message) {
         } else {
             console.log("Error");
         }
+    });
+}
+
+function getJiraIssues(bot, message, assignee) {
+    var url = BotConfig.jira.api_url + '2/search?jql=assignee=' + assignee;
+    console.log(url);
+    var request = require('request');
+    var jiraAuthToken = 'Basic ' + BotConfig.jira.auth_token;
+    request({
+        headers: {
+            'Authorization': jiraAuthToken
+        },
+        uri: url,
+        method: 'GET'
+    }, function(err, res, body) {
+        console.log("repo + body" + body); //For debugging purposes
+        parseAndResponseJiraJson(body, bot, message);
     });
 }
 
@@ -360,6 +385,25 @@ function parseAndResponseSOFJson(body, bot, message, tag) {
             "fallback": sofHeader,
             "color": "#36a64f",
             "title": sofHeader,
+            "text": response
+        }]
+    });
+}
+
+function parseAndResponseJiraJson(body, bot, message, tag) {
+    var obj = JSON.parse(body);
+    var objLength = obj.issues;
+    var jiraHeader = ":fire_engine: Current Issues : ";
+    var response = "";
+    for (var i = 0; i < objLength; i++) {
+        var issue_icon = ":no_entry:";
+        response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + BotConfig.jira.static_url + "/" + obj.issues[i].key;
+    }
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": jiraHeader,
+            "color": "#36a64f",
+            "title": jiraHeader,
             "text": response
         }]
     });
