@@ -282,20 +282,30 @@ function getStackoverflowIssues(bot, message) {
 }
 
 function getJiraIssues(bot, message, assignee) {
-    var url = BotConfig.jira.api_url + '2/search?jql=assignee=' + assignee;
-    console.log(url);
-    var request = require('request');
-    var jiraAuthToken = 'Basic ' + BotConfig.jira.auth_token;
-    request({
-        headers: {
-            'Authorization': jiraAuthToken
-        },
-        uri: url,
-        method: 'GET'
-    }, function(err, res, body) {
-        console.log("repo + body" + body); //For debugging purposes
-        parseAndResponseJiraJson(body, bot, message);
+    var authToken = 'Basic ' + BotConfig.auth_token;
+    var apiPath = '/rest/api/2/search?jql=assignee%3D' + assignee;
+
+    var http = require("https");
+    var options = {
+        "method": "GET",
+        "hostname": "jira.paypal.com",
+        "port": null,
+        "path": apiPath,
+        "headers": {
+            "authorization": authToken
+        }
+    };
+    var req = http.request(options, function(res) {
+        var chunks = [];
+        res.on("data", function(chunk) {
+            chunks.push(chunk);
+        });
+        res.on("end", function() {
+            var body = Buffer.concat(chunks);
+            parseAndResponseJiraJson(body.toString(), bot, message);
+        });
     });
+    req.end();
 }
 
 /* ************************* API RESPONSE PARSERS ******************************** */
@@ -365,7 +375,7 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
     console.log("parseAndResponseIssuesJson for " + repo + " with " + objLength + " Issues'(s) executed successfully.");
 }
 
-function parseAndResponseSOFJson(body, bot, message, tag) {
+function parseAndResponseSOFJson(body, bot, message) {
     var obj = JSON.parse(body);
     var objLength = obj.items.length;
     var sofHeader = ":fire_engine: Current Issues with label : " + BotConfig.stackoverflow.tag;
@@ -390,15 +400,22 @@ function parseAndResponseSOFJson(body, bot, message, tag) {
     });
 }
 
-function parseAndResponseJiraJson(body, bot, message, tag) {
+function parseAndResponseJiraJson(body, bot, message) {
+    console.log(body);
     var obj = JSON.parse(body);
-    var objLength = obj.issues;
+    var objLength = obj.total;
+
     var jiraHeader = ":fire_engine: Current Issues : ";
     var response = "";
-    for (var i = 0; i < objLength; i++) {
-        var issue_icon = ":no_entry:";
-        response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + BotConfig.jira.static_url + "/" + obj.issues[i].key;
+    if (objLength > 0) {
+        for (var i = 0; i < objLength; i++) {
+            var issue_icon = ":no_entry:";
+            response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + BotConfig.jira.static_url + "/" + obj.issues[i].key;
+        }
+    } else {
+        response += "\n No Issues found for this user !";
     }
+
     bot.reply(message, {
         "attachments": [{
             "fallback": jiraHeader,
