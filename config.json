@@ -64,5 +64,11 @@
         "tag": "paypal",
         "intitle": "webhooks",
         "site": "stackoverflow"
+    },
+    "jira": {
+        "auth_token": "",
+        "api_url": "jira.com",
+        "search_api_jql": "/rest/api/2/search?jql=assignee%3D",
+        "static_url":"https://jira.com/browse/"
     }
 }

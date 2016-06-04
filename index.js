@@ -282,19 +282,21 @@ function getStackoverflowIssues(bot, message) {
 }
 
 function getJiraIssues(bot, message, assignee) {
-    var authToken = 'Basic ' + BotConfig.auth_token;
-    var apiPath = '/rest/api/2/search?jql=assignee%3D' + assignee;
+    var authToken = 'Basic ' + BotConfig.jira.auth_token;
+    var apiPath = BotConfig.jira.search_api_jql + assignee;
+    var apiUrl = BotConfig.jira.api_url;
 
     var http = require("https");
     var options = {
         "method": "GET",
-        "hostname": "jira.paypal.com",
+        "hostname": apiUrl,
         "port": null,
         "path": apiPath,
         "headers": {
             "authorization": authToken
         }
     };
+
     var req = http.request(options, function(res) {
         var chunks = [];
         res.on("data", function(chunk) {
@@ -401,20 +403,26 @@ function parseAndResponseSOFJson(body, bot, message) {
 }
 
 function parseAndResponseJiraJson(body, bot, message) {
-    console.log(body);
-    var obj = JSON.parse(body);
-    var objLength = obj.total;
-
+    console.log("parseAndResponseJiraJsonBody-" + body);
     var jiraHeader = ":fire_engine: Current Issues : ";
     var response = "";
-    if (objLength > 0) {
-        for (var i = 0; i < objLength; i++) {
-            var issue_icon = ":no_entry:";
-            response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + BotConfig.jira.static_url + "/" + obj.issues[i].key;
+
+    try {
+        var obj = JSON.parse(body);
+        var objLength = obj.total;
+        if (objLength > 0) {
+            for (var i = 0; i < objLength; i++) {
+                var issue_icon = ":no_entry:";
+                response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + BotConfig.jira.static_url + "/" + obj.issues[i].key;
+            }
+        } else {
+            response += "\n No Issues found for this user !";
         }
-    } else {
-        response += "\n No Issues found for this user !";
+    } catch (e) {
+        response += "\n Unable to parse response JSON - " + e;
     }
+    
+    console.log(response);
 
     bot.reply(message, {
         "attachments": [{
