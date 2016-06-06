@@ -239,12 +239,47 @@
                 "intitle",
                 "site"
             ]
+        },
+        "jira": {
+            "type": "object",
+            "title": "Jira schema",
+            "description": "jira schema".,
+            "properties": {
+                "auth_token": {
+                    "type": "string",
+                    "title": "auth_token",
+                    "description": "Jira auth_token for making API calls."
+                },
+                "api_url": {
+                    "type": "string",
+                    "title": "Jira Api_url",
+                    "description": "Jira api URL."
+                },
+                "search_api_jql": {
+                    "type": "string",
+                    "title": "search_api_jql",
+                    "description": "Search API JIRA query language string.",
+                    "default": "/rest/api/2/search?jql=assignee%3D"
+                },
+                "static_url": {
+                    "type": "string",
+                    "title": "static_url",
+                    "description": "Static URL for JIRA."
+                }
+            },
+            "required": [
+                "auth_token",
+                "api_url",
+                "search_api_jql",
+                "static_url"
+            ]
         }
     },
     "required": [
         "version",
         "github_pull_requests",
         "github_issues",
-        "stackoverflow"
+        "stackoverflow",
+        "jira"
     ]
 }
