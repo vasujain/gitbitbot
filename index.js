@@ -146,6 +146,8 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
             });
         } else if (repo == 'all') {
             getListOfAllGithubReposInOrg(bot, message);
+        } else if (isValidRepo(repo, BotConfig.github_pull_requests.repos)) {
+            //            getListOfAllGithubReposInOrg(bot, message);
         } else {
             botErrorHandler("Invalid Repo or Repo not configured", bot, message);
         }
@@ -421,7 +423,7 @@ function parseAndResponseJiraJson(body, bot, message) {
     } catch (e) {
         response += "\n Unable to parse response JSON - " + e;
     }
-    
+
     console.log(response);
 
     bot.reply(message, {
@@ -482,6 +484,26 @@ function isValidTeam(repo, teamObj) {
             console.log("isValidRepo:true\n");
             return true;
         }
+    }
+    console.log("isValidRepo:false\n");
+    return false;
+}
+
+// Check if a Valid repo slected in slack channel. Matches with config.json 
+function isValidRepo(repo, repos) {
+    var reposLength = repos.teams.length;
+    for (var repoList = 0; repoList < reposLength; repoList++) {
+        var repoTeam = Object.keys(repos.teams[repoList]);
+        console.log("repoTeam: - " + repoTeam);
+        var teamRepos = repos.teams[repoList][repoTeam];
+        var repoTeamLength = repos.teams[repoList][repoTeam].length;
+        teamRepos.forEach(function(teamRepo) {
+            console.log("teamRepo: - " + teamRepo);
+            if (teamRepo == repo) {
+                console.log("isValidRepo:true\n");
+                return true;
+            }
+        });
     }
     console.log("isValidRepo:false\n");
     return false;
