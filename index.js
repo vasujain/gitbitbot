@@ -147,7 +147,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
         } else if (repo == 'all') {
             getListOfAllGithubReposInOrg(bot, message);
         } else if (isValidRepo(repo, BotConfig.github_pull_requests.repos)) {
-            //            getListOfAllGithubReposInOrg(bot, message);
+                githubGetPullRequest(repo, bot, message, flagZeroPRComment);
         } else {
             botErrorHandler("Invalid Repo or Repo not configured", bot, message);
         }
@@ -325,7 +325,7 @@ function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
         if (!DISABLE_ZERO_PR_REPO) { //if false, then only display Repo with Zero PR 
             response = repoSource;
             if (flagZeroPRComment) {
-                response += "No open PR's @ the moment ! Are you guys coding ?";
+                response += "No open PR's @ the moment ! ";
             } else {
                 response += "0.";
             }
@@ -497,13 +497,12 @@ function isValidRepo(repo, repos) {
         console.log("repoTeam: - " + repoTeam);
         var teamRepos = repos.teams[repoList][repoTeam];
         var repoTeamLength = repos.teams[repoList][repoTeam].length;
-        teamRepos.forEach(function(teamRepo) {
-            console.log("teamRepo: - " + teamRepo);
-            if (teamRepo == repo) {
+        for(var i=0; i<teamRepos.length; i++) {
+            if(teamRepos[i] == repo) {
                 console.log("isValidRepo:true\n");
                 return true;
             }
-        });
+        }
     }
     console.log("isValidRepo:false\n");
     return false;
