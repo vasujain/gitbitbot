@@ -147,7 +147,7 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
         } else if (repo == 'all') {
             getListOfAllGithubReposInOrg(bot, message);
         } else if (isValidRepo(repo, BotConfig.github_pull_requests.repos)) {
-                githubGetPullRequest(repo, bot, message, flagZeroPRComment);
+            githubGetPullRequest(repo, bot, message, flagZeroPRComment);
         } else {
             botErrorHandler("Invalid Repo or Repo not configured", bot, message);
         }
@@ -287,8 +287,8 @@ function getJiraIssues(bot, message, assignee) {
     var authToken = 'Basic ' + BotConfig.jira.auth_token;
     var apiPath = BotConfig.jira.search_api_jql + assignee;
     var apiUrl = BotConfig.jira.api_url;
-
     var http = require("https");
+
     var options = {
         "method": "GET",
         "hostname": apiUrl,
@@ -405,17 +405,20 @@ function parseAndResponseSOFJson(body, bot, message) {
 }
 
 function parseAndResponseJiraJson(body, bot, message) {
-    console.log("parseAndResponseJiraJsonBody-" + body);
     var jiraHeader = ":fire_engine: Current Issues : ";
     var response = "";
-
     try {
+        //TODO: Add wait time
         var obj = JSON.parse(body);
         var objLength = obj.total;
         if (objLength > 0) {
             for (var i = 0; i < objLength; i++) {
-                var issue_icon = ":no_entry:";
-                response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + BotConfig.jira.static_url + "/" + obj.issues[i].key;
+                if (obj.issues[i].fields.status.name != "Closed") {
+                    var issue_icon = ":no_entry:";
+                    response += "\n " + issue_icon + " Ticket # " + obj.issues[i].key + " - " + obj.issues[i].fields.description;
+                    response += "\n " + BotConfig.jira.static_url + obj.issues[i].key;
+                    console.log("Status: " + obj.issues[i].key + " " + obj.issues[i].fields.status.name);
+                }
             }
         } else {
             response += "\n No Issues found for this user !";
@@ -423,8 +426,6 @@ function parseAndResponseJiraJson(body, bot, message) {
     } catch (e) {
         response += "\n Unable to parse response JSON - " + e;
     }
-
-    console.log(response);
 
     bot.reply(message, {
         "attachments": [{
@@ -497,8 +498,8 @@ function isValidRepo(repo, repos) {
         console.log("repoTeam: - " + repoTeam);
         var teamRepos = repos.teams[repoList][repoTeam];
         var repoTeamLength = repos.teams[repoList][repoTeam].length;
-        for(var i=0; i<teamRepos.length; i++) {
-            if(teamRepos[i] == repo) {
+        for (var i = 0; i < teamRepos.length; i++) {
+            if (teamRepos[i] == repo) {
                 console.log("isValidRepo:true\n");
                 return true;
             }
