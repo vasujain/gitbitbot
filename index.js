@@ -374,6 +374,8 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
                 "text": response
             }]
         });
+    } else {
+        response += "\n No Issues found for this label !";
     }
     console.log(response);
     console.log("parseAndResponseIssuesJson for " + repo + " with " + objLength + " Issues'(s) executed successfully.");
@@ -384,16 +386,21 @@ function parseAndResponseSOFJson(body, bot, message) {
     var objLength = obj.items.length;
     var sofHeader = ":fire_engine: Current Issues with label : " + BotConfig.stackoverflow.tag;
     var response = "";
-    for (var i = 0; i < objLength; i++) {
-        var issue_icon = "";
-        if (obj.items[i].is_answered) {
-            issue_icon += ":white_check_mark:";
-        } else {
-            issue_icon += ":no_entry:";
+    if (objLength > 0) {
+        for (var i = 0; i < objLength; i++) {
+            var issue_icon = "";
+            if (obj.items[i].is_answered) {
+                issue_icon += ":white_check_mark:";
+            } else {
+                issue_icon += ":no_entry:";
+            }
+            response += "\n " + issue_icon + " Question # " + obj.items[i].question_id + " - " + obj.items[i].title + " by " + obj.items[i].owner.display_name;
+            response += "\n " + obj.items[i].link;
         }
-        response += "\n " + issue_icon + " Question # " + obj.items[i].question_id + " - " + obj.items[i].title + " by " + obj.items[i].owner.display_name;
-        response += "\n " + obj.items[i].link;
+    } else {
+        response += "\n No Issues found for the label !";
     }
+
     bot.reply(message, {
         "attachments": [{
             "fallback": sofHeader,
