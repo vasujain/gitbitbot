@@ -55,7 +55,7 @@ var REPO_ORG = BotConfig.github_pull_requests.repo_org;
 var GITHUB_API_URL = BotConfig.github_pull_requests.api_url;
 var GITHUB_AUTH_TOKEN = BotConfig.github_pull_requests.auth_token;
 var MAX_PAGE_COUNT = BotConfig.github_pull_requests.max_page_count;
-var DISABLE_ZERO_PR_REPO = BotConfig.github_pull_requests.disable_zero_pr_repo;
+var DISPLAY_ZERO_PR_REPO = BotConfig.github_pull_requests.display_zero_pr_repo;
 var authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
 var GITHUB_ISSUES_API_URL = BotConfig.github_issues.api_url;
 var GITHUB_ISSUES_STATE = BotConfig.github_issues.issue_state;
@@ -83,7 +83,7 @@ if (token) {
         GITHUB_API_URL = message.resource.GITHUB_API_URL;
         GITHUB_AUTH_TOKEN = message.resource.GITHUB_AUTH_TOKEN;
         MAX_PAGE_COUNT = message.resource.MAX_PAGE_COUNT;
-        DISABLE_ZERO_PR_REPO = message.resource.DISABLE_ZERO_PR_REPO;
+        DISPLAY_ZERO_PR_REPO = message.resource.DISPLAY_ZERO_PR_REPO;
         authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
     });
 }
@@ -135,19 +135,18 @@ controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], fun
     var repo = message.match[1];
     if (typeof repo !== 'undefined' && repo) {
         var githubRepo = BotConfig.github_pull_requests.repos[repo];
-        var flagZeroPRComment = false;
         //Check and throw error if team is invalid -- Object.keys(bb.repos.teams).length
         if (isValidTeam(repo, Object.keys(BotConfig.github_pull_requests.repos.teams))) {
             var key = repo,
                 teamRepos;
             BotConfig.github_pull_requests.repos.teams.some((v) => Object.keys(v).indexOf(key) !== -1 && (teamRepos = v[key]), teamRepos);
             teamRepos.forEach(function(teamRepo) {
-                githubGetPullRequest(teamRepo, bot, message, flagZeroPRComment);
+                githubGetPullRequest(teamRepo, bot, message);
             });
         } else if (repo == 'all') {
             getListOfAllGithubReposInOrg(bot, message);
         } else if (isValidRepo(repo, BotConfig.github_pull_requests.repos)) {
-            githubGetPullRequest(repo, bot, message, flagZeroPRComment);
+            githubGetPullRequest(repo, bot, message);
         } else {
             botErrorHandler("Invalid Repo or Repo not configured", bot, message);
         }
@@ -206,7 +205,7 @@ controller.hears('dev', ['direct_mention', 'mention', 'direct_message'], functio
 
 /* ************************* GITHUB FUNCTIONS ******************************** */
 // Make a POST call to GITHUB API to fetch all OPEN PR's
-function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
+function githubGetPullRequest(repo, bot, message) {
     console.log("Making a GET call to GITHUB API to fetch all OPEN PR's...");
     var request = require('request');
     var url = GITHUB_API_URL + 'repos/' + REPO_ORG + repo + '/pulls?state=open';
@@ -221,7 +220,7 @@ function githubGetPullRequest(repo, bot, message, flagZeroPRComment) {
         method: 'GET'
     }, function(err, res, body) {
         //console.log("repo + body" + repo + body);   //For debugging purposes
-        parseAndResponse(body, bot, message, repo, flagZeroPRComment);
+        parseAndResponse(body, bot, message, repo);
     });
 }
 
@@ -314,37 +313,30 @@ function getJiraIssues(bot, message, assignee) {
 
 /* ************************* API RESPONSE PARSERS ******************************** */
 // Parse the pull response json and extract PR#, Title, User out of it.
-function parseAndResponse(body, bot, message, repo, flagZeroPRComment) {
+function parseAndResponse(body, bot, message, repo) {
     console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
-    //    console.log(body);    
     var repoSource = ":shipit: " + REPO_ORG + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
     var objLength = obj.length;
     if (obj.length == 0) {
-        if (!DISABLE_ZERO_PR_REPO) { //if false, then only display Repo with Zero PR 
-            response = repoSource;
-            if (flagZeroPRComment) {
-                response += "No open PR's @ the moment ! ";
-            } else {
-                response += "0.";
-            }
-            bot.reply(message, response);
-        }
+        response += "No open PR's @ the moment !";
+//        if (!DISABLE_ZERO_PR_REPO) { //if false, then only display Repo with Zero PR 
+//        }
     } else {
         for (var i = 0; i < objLength; i++) {
             response += "\n :construction: PR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
         }
-        bot.reply(message, {
-            "attachments": [{
-                "fallback": repoSource,
-                "color": "#36a64f",
-                "title": repoSource,
-                "text": response
-            }]
-        });
     }
-    console.log(response);
+    console.log("response: " + response);
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": repoSource,
+            "color": "#36a64f",
+            "title": repoSource,
+            "text": response
+        }]
+    });
     console.log("parseAndResponse for " + repo + " with " + objLength + " PR'(s) executed successfully.");
 }
 
