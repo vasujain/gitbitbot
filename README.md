@@ -81,6 +81,16 @@ e.g. config.json
 
 You may read more about config.json parameter @ `schema.json`
 
+## Changelog
+  * 1.7: Added Change log capability.
+  * 1.6: Added Rally Integration for a user.
+  * 1.5: Added Corp API profile Integration for a user.
+  * 1.4: Added JIRA Integration for a user.
+  * 1.3: Added Stackoverflow Integration for selected tags.
+  * 1.2: Added Github Issues Integration for selected labels on selected repos.
+  * 1.1: Added Github custom Integration for selected repos.
+  * 1.0: Added Github to get a list of open Pull Requests. 
+
 ## Future
 Configurable Slack button coming soon @ https://vasujain.github.io/gitbitbot/
 
