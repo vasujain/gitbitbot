@@ -8,7 +8,6 @@ var https = require('https');
 var BotConfig = require('./config.json');
 var Botkit = require("botkit");
 var beepboop = require("beepboop-botkit");
-var teamMap = Object.create(null);
 
 function onInstallation(bot, installer) {
     if (installer) {
@@ -45,7 +44,7 @@ var controller = Botkit.slackbot({
     debug: false
 });
 
-var slackTokenEncrypted = "eG94Yi00MjUyNzYwMzU5MC1DZ21YWXMxNk1RdXYyeVE2YTFORG1nalc=";
+var slackTokenEncrypted = BotConfig.admin_config.slack.slack_token_encrypted;
 var slackTokenBuf = new Buffer(slackTokenEncrypted, 'base64');
 var token = slackTokenBuf.toString("ascii");
 console.log(token);
@@ -59,7 +58,6 @@ var DISPLAY_ZERO_PR_REPO = BotConfig.github_pull_requests.display_zero_pr_repo;
 var authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
 var GITHUB_ISSUES_API_URL = BotConfig.github_issues.api_url;
 var GITHUB_ISSUES_STATE = BotConfig.github_issues.issue_state;
-
 
 if (token) {
     console.log("Starting in single-team mode");
@@ -87,8 +85,6 @@ if (token) {
         authTokenDecrypted = "token " + new Buffer(GITHUB_AUTH_TOKEN, 'base64').toString("ascii");
     });
 }
-//For debugging purposes
-//console.log("REPO_ORG-" + REPO_ORG + " GITHUB_API_URL--" + GITHUB_API_URL);
 
 // Handle events related to the websocket connection to Slack
 controller.on('rtm_open', function(bot) {
@@ -112,6 +108,9 @@ controller.hears('help', ['direct_mention', 'mention', 'direct_message'], functi
     helpCommand += ":pushpin: pr all - Gets pull request for all repos in your organization. \n";
     helpCommand += ":pushpin: github issues - Gets list of all Github issues in a repo with issue-label. \n";
     helpCommand += ":pushpin: sof issues - Get list of Stackoverflow questions with tag and intitle word. \n";
+    helpCommand += ":pushpin: user {username} - Get details for a corp user. \n";
+    helpCommand += ":pushpin: rally {username} - Get tasks for a rally user. \n";
+    helpCommand += ":pushpin: changelog - Get changelog for bot. \n";
     helpCommand += ":pushpin: dev - Get Developer details. \n";
     bot.reply(message, {
         "attachments": [{
@@ -128,10 +127,12 @@ controller.on('bot_channel_join', function(bot, message) {
 });
 
 controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Hello Human !! ");
     bot.reply(message, 'Hello!');
 });
 
 controller.hears('pr (.*)', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("GitHub PR !! ");
     var repo = message.match[1];
     if (typeof repo !== 'undefined' && repo) {
         var githubRepo = BotConfig.github_pull_requests.repos[repo];
@@ -176,7 +177,7 @@ controller.hears(['sof issues', 'stack overflow issues', 'stack_overflow issues'
     getStackoverflowIssues(bot, message);
 });
 
-controller.hears(['jira issues (.*)'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['jira issues (.*)', 'jira issue (.*)', 'jira (.*)'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     console.log("Jira issues !! ");
     var assignee = message.match[1];
     if (typeof assignee !== 'undefined' && assignee) {
@@ -186,7 +187,19 @@ controller.hears(['jira issues (.*)'], ['direct_mention', 'mention', 'direct_mes
     }
 });
 
-controller.hears('dev', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['user (.*)', 'pp (.*)', 'paypal (.*)', 'bridge (.*)'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Corp User Details!! ");
+    var user = message.match[1];
+    getCorpUserDetails(bot, message, user);
+});
+
+controller.hears(['rally tasks (.*)', 'rally task (.*)', 'rally (.*)'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("Rally User tasks!! ");
+    var user = message.match[1];
+    getRallyUserTasks(bot, message, user);
+});
+
+controller.hears(['dev', 'developer', 'architect'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     console.log("Dev !! -- Listing developer Details ...");
     var devMsg = ":octocat: Dev Details \n";
     var devCommand = "";
@@ -203,10 +216,16 @@ controller.hears('dev', ['direct_mention', 'mention', 'direct_message'], functio
     });
 });
 
-/* ************************* GITHUB FUNCTIONS ******************************** */
+controller.hears(['change', 'changelog', 'version'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    console.log("changelog !!");
+    parseChangeLog(bot, message);
+});
+
+/* ************************* HTTP Methods ******************************** */
+
 // Make a POST call to GITHUB API to fetch all OPEN PR's
 function githubGetPullRequest(repo, bot, message) {
-    console.log("Making a GET call to GITHUB API to fetch all OPEN PR's...");
+    console.log("*** Invoking githubGetPullRequest ... ***");
     var request = require('request');
     var url = GITHUB_API_URL + 'repos/' + REPO_ORG + repo + '/pulls?state=open';
     console.log(url);
@@ -219,14 +238,14 @@ function githubGetPullRequest(repo, bot, message) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-        //console.log("repo + body" + repo + body);   //For debugging purposes
         parseAndResponse(body, bot, message, repo);
     });
+    console.log("*** Invoked githubGetPullRequest successfully. ***");
 }
 
 // Make a POST call to GITHUB API to fetch all Issues with specific Label's
 function githubGetIssuesWithLabel(repo, repoOrg, bot, message, label) {
-    console.log("Making a GET call to GITHUB API to fetch all Issues With Label");
+    console.log("*** Invoking githubGetIssuesWithLabel ... ***");
     var url = GITHUB_ISSUES_API_URL + 'repos/' + repoOrg + '/' + repo + '/issues?labels=' + label + "&state=" + GITHUB_ISSUES_STATE;
     var request = require('request');
     request({
@@ -237,32 +256,17 @@ function githubGetIssuesWithLabel(repo, repoOrg, bot, message, label) {
         uri: url,
         method: 'GET'
     }, function(err, res, body) {
-        //console.log("repo + body" + repo + body); //For debugging purposes
         parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label);
     });
-}
-
-// Parse the Org Repos response json and extracting Repo details out of it.
-function constructAllGithubRepoObject(body, bot, message) {
-    console.log("Parsing the Org Repos response json and extracting Repo details out of it...");
-    var orgGithubRepo = new Array();
-    var obj = JSON.parse(body);
-    var objLength = obj.length;
-    for (var i = 0; i < objLength; i++) {
-        orgGithubRepo.push(obj[i].name);
-        githubGetPullRequest(obj[i].name, bot, message, false);
-    }
-    console.log("constructAllGithubRepoObject executed successfully.\n");
+    console.log("*** Invoked githubGetIssuesWithLabel successfully. ***");
 }
 
 function getStackoverflowIssues(bot, message) {
+    console.log("*** Invoking getStackoverflowIssues ... ***");
     var zlib = require("zlib");
     var https = require('https'); //Use NodeJS https module
-    //'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&tagged=paypal&intitle=webhooks&site=stackoverflow';
     var url = BotConfig.stackoverflow.api_url + '2.2/search' + '?order=' + BotConfig.stackoverflow.order + '&sort=' + BotConfig.stackoverflow.sort + '&tagged=' + BotConfig.stackoverflow.tag + '&intitle=' + BotConfig.stackoverflow.intitle + '&site=' + BotConfig.stackoverflow.site;
     https.get(url, function(response) {
-        console.log("headers: ", response.headers);
-        console.log(response.statusCode)
         if (response.statusCode == 200) {
             var gunzip = zlib.createGunzip();
             var jsonString = '';
@@ -275,14 +279,17 @@ function getStackoverflowIssues(bot, message) {
             });
             gunzip.on('error', function(e) {
                 console.log(e);
+                botErrorHandler(e, bot, message)
             });
         } else {
             console.log("Error");
         }
     });
+    console.log("*** Invoked getStackoverflowIssues successfully. ***");
 }
 
 function getJiraIssues(bot, message, assignee) {
+    console.log("*** Invoking getJiraIssues ... ***");
     var authToken = 'Basic ' + BotConfig.jira.auth_token;
     var apiPath = BotConfig.jira.search_api_jql + assignee;
     var apiUrl = BotConfig.jira.api_url;
@@ -309,26 +316,108 @@ function getJiraIssues(bot, message, assignee) {
         });
     });
     req.end();
+    console.log("*** Invoked getJiraIssues successfully. ***");
+}
+
+function getCorpUserDetails(bot, message, user) {
+    console.log("*** Invoking getCorpUserDetails ... ***");
+    var apiPath = BotConfig.user.user_profile + BotConfig.user.get_details_api + BotConfig.user.auth_token + "/corp/" + user;
+    var http = require("https");
+
+    var options = {
+        "hostname": BotConfig.user.api_url,
+        "method": "GET",
+        "port": null,
+        "rejectUnauthorized": false, 
+        "path": apiPath
+    };
+
+    var req = http.request(options, function(res) {
+        var chunks = [];
+        res.on("data", function(chunk) {
+            chunks.push(chunk);
+        });
+        res.on("end", function() {
+            var body = Buffer.concat(chunks);
+            parseAndResponseCorpUserDetailsJson(body.toString(), bot, message);
+        });
+    });
+    req.end();
+    console.log("*** Invoked getCorpUserDetails successfully. ***");
+}
+
+// Getting list of all Github Repos in an Org. Can be 100+. For the initial phase only top 100 results will display
+function getListOfAllGithubReposInOrg(bot, message) {
+    console.log("*** Invoking getListOfAllGithubReposInOrg ... ***");
+    var ghArray = new Array();
+    var url = GITHUB_API_URL + 'orgs/' + REPO_ORG + 'repos?per_page=' + MAX_PAGE_COUNT;
+    console.log(url);
+    var request = require('request');
+    request({
+        headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': authTokenDecrypted,
+            'User-Agent': 'GitBit-slackbot'
+        },
+        uri: url,
+        method: 'GET'
+    }, function(err, res, body) {
+        if (err)
+            botErrorHandler(err, bot, message);
+        else
+            ghArray = constructAllGithubRepoObject(body, bot, message);
+    });
+    console.log("*** Invoked getListOfAllGithubReposInOrg successfully. ***");
+}
+
+function getRallyUserTasks(bot, message, user) {
+    console.log("*** Invoking getRallyUserTasks ... ***");
+    var path = BotConfig.rally.task_query_api + "((" + BotConfig.rally.filter_owner + "%20=%20" + user + "@" + BotConfig.rally.user_domain + ")%20and%20(" +  BotConfig.rally.filter_state + "%20!=%20" + BotConfig.rally.status_filter_state + "))&" + BotConfig.rally.query_params;
+    console.log("path: " + path);
+    
+    var http = require("https");
+    var options = {
+      "method": "GET",
+      "hostname": BotConfig.rally.api_url,
+      "port": null,
+      "path": path,
+      "headers": {
+        "zsessionid": BotConfig.rally.api_key
+       }
+    };
+    
+    var req = http.request(options, function (res) {
+      var chunks = [];
+
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+      });
+
+      res.on("end", function () {
+        var body = Buffer.concat(chunks);
+        parseAndResponseRallyUserTasksJson(bot, message, body.toString(), user);
+      });
+    });
+
+    req.end();
+    console.log("*** Invoked getRallyUserTasks successfully. ***");
 }
 
 /* ************************* API RESPONSE PARSERS ******************************** */
 // Parse the pull response json and extract PR#, Title, User out of it.
 function parseAndResponse(body, bot, message, repo) {
-    console.log("Parsing the pull response json and extracting PR#, Title, User out of it...");
+    console.log("*** Invoking parseAndResponse ... ***");
     var repoSource = ":shipit: " + REPO_ORG + repo + " Open Pull Requests : ";
     var response = "";
     var obj = JSON.parse(body);
     var objLength = obj.length;
     if (obj.length == 0) {
         response += "No open PR's @ the moment !";
-//        if (!DISABLE_ZERO_PR_REPO) { //if false, then only display Repo with Zero PR 
-//        }
     } else {
         for (var i = 0; i < objLength; i++) {
             response += "\n :construction: PR # " + obj[i].number + " - " + obj[i].title + " by " + obj[i].user.login;
         }
     }
-    console.log("response: " + response);
     bot.reply(message, {
         "attachments": [{
             "fallback": repoSource,
@@ -337,12 +426,12 @@ function parseAndResponse(body, bot, message, repo) {
             "text": response
         }]
     });
-    console.log("parseAndResponse for " + repo + " with " + objLength + " PR'(s) executed successfully.");
+    console.log("*** Invoked parseAndResponse for " + repo + " with " + objLength + " PR'(s) executed successfully. ***");
 }
 
 // Parse the issue response json and extracting details out of it.
 function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
-    console.log("Parsing the issue response json and extracting details out of it...");
+    console.log("*** Invoking parseAndResponseIssuesJson ... ***");
     var repoSource = ":fire_engine: " + repoOrg + "/" + repo + " Issues with label : " + label;
     var response = "";
     var obj = JSON.parse(body);
@@ -370,10 +459,11 @@ function parseAndResponseIssuesJson(body, bot, message, repo, repoOrg, label) {
         response += "\n No Issues found for this label !";
     }
     console.log(response);
-    console.log("parseAndResponseIssuesJson for " + repo + " with " + objLength + " Issues'(s) executed successfully.");
+    console.log("*** Invoked parseAndResponseIssuesJson for " + repo + " with " + objLength + " Issues'(s) executed successfully.***");
 }
 
 function parseAndResponseSOFJson(body, bot, message) {
+    console.log("*** Invoking parseAndResponseSOFJson ... ***");
     var obj = JSON.parse(body);
     var objLength = obj.items.length;
     var sofHeader = ":fire_engine: Current Issues with label : " + BotConfig.stackoverflow.tag;
@@ -401,9 +491,11 @@ function parseAndResponseSOFJson(body, bot, message) {
             "text": response
         }]
     });
+    console.log("*** Invoked parseAndResponseSOFJson successfully. ***");
 }
 
 function parseAndResponseJiraJson(body, bot, message) {
+    console.log("*** Invoking parseAndResponseJiraJson ... ***");
     var jiraHeader = ":fire_engine: Current Issues : ";
     var response = "";
     try {
@@ -434,33 +526,117 @@ function parseAndResponseJiraJson(body, bot, message) {
             "text": response
         }]
     });
+    console.log("*** Invoked parseAndResponseJiraJson successfully. ***");
 }
 
-// Getting list of all Github Repos in an Org. Can be 100+. For the initial phase only top 100 results will display
-function getListOfAllGithubReposInOrg(bot, message) {
-    console.log("Getting list of all Github Repos in an Org. Can be 100+....");
-    var ghArray = new Array();
-    var url = GITHUB_API_URL + 'orgs/' + REPO_ORG + 'repos?per_page=' + MAX_PAGE_COUNT;
-    console.log(url);
-    var request = require('request');
-    request({
-        headers: {
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': authTokenDecrypted,
-            'User-Agent': 'GitBit-slackbot'
-        },
-        uri: url,
-        method: 'GET'
-    }, function(err, res, body) {
-        if (err)
-            botErrorHandler(err, bot, message);
-        else
-            ghArray = constructAllGithubRepoObject(body, bot, message);
+// Parse the Org Repos response json and extracting Repo details out of it.
+function constructAllGithubRepoObject(body, bot, message) {
+    console.log("*** Invoking constructAllGithubRepoObject ... ***");
+    var orgGithubRepo = new Array();
+    var obj = JSON.parse(body);
+    var objLength = obj.length;
+    for (var i = 0; i < objLength; i++) {
+        orgGithubRepo.push(obj[i].name);
+        githubGetPullRequest(obj[i].name, bot, message, false);
+    }
+    console.log("*** Invoked constructAllGithubRepoObject successfully. ***");
+}
+
+function parseAndResponseCorpUserDetailsJson(body, bot, message) {
+    console.log("Invoking parseAndResponseCorpUserDetailsJson...");
+    var userHeader = ":lock_with_ink_pen: Corp User Details: ";
+    var response = "";
+    try {
+        var obj = JSON.parse(body);
+        if(obj.DisplayName == null) {
+            botErrorHandler("Unable to find the corp user", bot, message);
+        } else {
+            response += "\n " + ":simple_smile:" + " DisplayName : " + obj.DisplayName;
+            response += "\n " + ":neckbeard:" + " SAMAccount : " + obj.SAMAccount;
+            response += "\n " + ":email:" + " Email : " + obj.Email;
+            response += "\n " + ":octocat:" + " JobTitle : " + obj.JobTitle;
+            response += "\n " + ":books:" + " Department : " + obj.Department;
+            response += "\n " + ":telephone:" + " Telephone : " + obj.Telephone;
+            response += "\n " + ":office:" + " Location : " + obj.Location;
+            response += "\n " + ":factory:" + " Company : " + obj.Company;
+            response += "\n " + ":sunglasses:" + " ManagerDisplayName : " + obj.ManagerDisplayName;
+            response += "\n " + ":space_invader:" + " ManagerSAMAccount : " + obj.ManagerSAMAccount;
+            response += "\n " + ":bridge_at_night:" + " Bridge URL : " +  "https://bridge.paypalcorp.com/profile/" + obj.SAMAccount;
+            
+            // Setting Slack output within conditional flow to avoid duplicate notifications 
+            bot.reply(message, {
+                "attachments": [{
+                    "fallback": userHeader,
+                    "color": "#36a64f",
+                    "title": userHeader,
+                    "text": response
+                }]
+            });
+        }       
+    } catch (e) {
+        console.log("\n Unable to parse response JSON - " + e);
+    }
+    console.log("*** Invoked parseAndResponseCorpUserDetailsJson successfully. ***");
+}
+
+function parseAndResponseRallyUserTasksJson(bot, message, body, user) {
+    console.log("*** Parsing the Rally response json.... ***");    
+    var userHeader = ":lock_with_ink_pen: Corp User Details: ";
+    var response = "";
+    var rallyHeader = "User Tasks for " + user + "...";    
+    var obj = JSON.parse(body);
+    var objLength = obj.QueryResult.Results.length;
+    var response = "";
+    if (objLength == 0) {
+        response += "No results @ the moment !";
+    } else {
+        for (var i = 0; i < objLength; i++) {
+            response += " :memo: " + (i+1) + ". ";
+            var taskUrl = obj.QueryResult.Results[i]._ref;
+            if(obj.QueryResult.Results[i].Project != null) {
+                var projectId = projectId = obj.QueryResult.Results[i].Project._ref.substr(obj.QueryResult.Results[i].Project._ref.indexOf('project/'));
+                var taskId = projectId = obj.QueryResult.Results[i].ObjectID;
+                taskUrl = BotConfig.rally.https_url + projectId + "/detail/task/" + taskId;
+                response += obj.QueryResult.Results[i].Project._refObjectName + "-" 
+            }
+            if(obj.QueryResult.Results[i].Iteration != null) {
+                response += obj.QueryResult.Results[i].Iteration._refObjectName + ": ";
+            }
+            response += obj.QueryResult.Results[i]._refObjectName;
+            response += " " + taskUrl + "\n";
+        }
+    }
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": rallyHeader,
+            "color": "#36a64f",
+            "title": rallyHeader,
+            "text": response
+        }]
     });
-    console.log("getListOfAllGithubReposInOrg executed successfully.\n");
+    console.log("*** Parsed the Rally response json successfully. ***");
 }
 
-/* ************************* UTILITY FUNCTIONS ******************************** */
+function parseChangeLog(bot, message) {
+    console.log("*** Parsing the Changelog response json.... ***");    
+    var changeLogObj = BotConfig.change_log;
+    var response = "";
+    var changeHeader = "Change log for the Bot: ";
+    for(var i=0; i<changeLogObj.length; i++) {
+        response += BotConfig.change_log[i].version + ": " + BotConfig.change_log[i].change + "\n";
+    }
+    bot.reply(message, {
+        "attachments": [{
+            "fallback": changeHeader,
+            "color": "#36a64f",
+            "title": changeHeader,
+            "text": response
+        }]
+    });
+    console.log("*** Parsed the Changelog response successfully. ***");
+}
+
+/* ************************* Utility Methods ******************************** */
 // Bot Error Handler
 function botErrorHandler(err, bot, message) {
     console.log("\n" + err);
@@ -477,6 +653,7 @@ function botErrorHandler(err, bot, message) {
 
 // Check if a Valid team name slected in slack channel. Matches with config.json 
 function isValidTeam(repo, teamObj) {
+    console.log("*** Checking if a Valid team name is slected in slack channel.... ***");    
     var teamLength = teamObj.length;
     for (var i = 0; i < teamLength; i++) {
         var teamStr = Object.keys(BotConfig.github_pull_requests.repos.teams[i]);
@@ -491,6 +668,7 @@ function isValidTeam(repo, teamObj) {
 
 // Check if a Valid repo slected in slack channel. Matches with config.json 
 function isValidRepo(repo, repos) {
+    console.log("*** Checking if a Valid repo is slected in slack channel.... ***");    
     var reposLength = repos.teams.length;
     for (var repoList = 0; repoList < reposLength; repoList++) {
         var repoTeam = Object.keys(repos.teams[repoList]);
@@ -506,4 +684,60 @@ function isValidRepo(repo, repos) {
     }
     console.log("isValidRepo:false\n");
     return false;
+}
+
+function getYelpDetails(bot, message) {
+    //Yelp reference : https://.io/how-to-use-yelps-api-with-node/
+    console.log("*** getYelpDetails invoked ... ***");
+    /* require the modules needed */
+    var oauthSignature = require('oauth-signature');  
+    var n = require('nonce')();  
+    var request = require('request');  
+    var qs = require('querystring');  
+    var _ = require('lodash');
+
+    /* We set the require parameters here */
+    var required_parameters = {
+        oauth_consumer_key : BotConfig.yelp.oauth_consumer_key,
+        oauth_token : BotConfig.yelp.oauth_token,
+        oauth_nonce : n(),
+        oauth_timestamp : n().toString().substr(0,10),
+        oauth_signature_method : 'HMAC-SHA1',
+        oauth_version : '1.0'
+    };
+
+    console.log("required_parameters ..." + required_parameters);
+
+    var http = require("https");
+    var httpMethod = 'GET';
+    var url = 'http://api.yelp.com/v2/search';
+
+    /* We can setup default parameters here */
+      var default_parameters = {
+        location: 'San+Jose'
+      };
+
+    /* We combine all the parameters in order of importance */ 
+    var parameters = _.assign(default_parameters, required_parameters);
+    
+    /* We set our secrets here */
+    var consumerSecret = BotConfig.yelp.consumer_secret;
+    var tokenSecret = BotConfig.yelp.token_secret;
+
+    /* Then we call Yelp's Oauth 1.0a server, and it returns a signature */
+    /* Note: This signature is only good for 300 seconds after the oauth_timestamp */
+    var signature = oauthSignature.generate(httpMethod, url, parameters, consumerSecret, tokenSecret, { encodeSignature: false});
+    
+    console.log("signature ..." + signature);
+        
+    parameters.oauth_signature = signature;
+    var paramURL = qs.stringify(parameters);
+    var apiURL = url+'?'+paramURL;
+
+    console.log("apiURL ..." + apiURL);
+
+    /* Then we use request to send make the API Request */
+      request(apiURL, function(error, response, body){
+        parseAndResponseYelpData(body, bot, message);
+      });
 }
